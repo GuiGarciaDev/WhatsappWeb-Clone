@@ -1,0 +1,56 @@
+.profile-button {
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    padding: 20px 10px;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+
+    img {
+        opacity: 0.8;
+        
+    }
+
+    #button-frow {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .button-frow-start {
+            display: flex;
+            align-items: flex-start;
+            column-gap: 20px;
+
+            .button-title-sub {
+                display: flex;
+                flex-direction: column;
+
+                span {
+                    align-self: flex-start;
+                    text-align: start;
+                }
+            }
+
+            img {
+                margin-top: 1px;
+                
+            }
+        }
+
+        h1 {
+            font-size: 17px;
+            text-align: start;
+            font-weight: normal;
+            margin-top: 0px;
+            margin-bottom: 3px;
+        }
+    }
+
+    
+}
+
+[name="red"]:hover {
+    background-color: var(--card-hover);
+}

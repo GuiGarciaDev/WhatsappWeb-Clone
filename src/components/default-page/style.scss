@@ -1,0 +1,35 @@
+.all {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    color: var(--texts);
+    border-bottom: 8px solid var(--down-border);
+    pointer-events: none;
+    
+
+    h1 {
+      font-size: 28px;
+      margin-top: 50px;
+      color: var(--texts);
+    }
+  
+    span {
+      font-size: 14px;
+    }
+
+    .down-advice {
+      display: flex;
+      position: absolute;
+      bottom: 25px;
+      align-items: center;
+      column-gap: 5px;
+
+      img {
+        height: 15px;
+        opacity: 0.25;
+        filter: invert(100%) sepia(3%) saturate(166%) hue-rotate(65deg) brightness(114%) contrast(87%);
+      }
+    }
+  }
