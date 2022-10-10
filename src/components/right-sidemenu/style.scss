@@ -1,0 +1,51 @@
+.sidebarRight {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    overflow-y: scroll;
+    width: 400px;
+    right: 0;
+    background-color: var(--background-left);
+    font-size: 14px;
+    transition: .7s ease; 
+    z-index: 10;
+
+    #header {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 74px;
+      padding-left: 20px;
+      column-gap: 20px;
+      color: white;
+      background-color: var(--background-right);
+
+      button {
+          border: 0;
+          padding: 0;
+          background-color: transparent;
+          opacity: 0.6;
+          cursor: pointer;
+
+          svg {
+            height: 20px;
+            width: 20px;
+            fill: white;
+            opacity: 0.9;
+          }
+      }
+
+      span {
+          font-size: 16px;
+          opacity: 0.9;
+          margin-bottom: 6px;
+      }
+  }
+
+  .sidebarRight-Content {
+    display: flex;
+    height: calc(721.6px - 74px);
+    flex-direction: column;
+    overflow-y: scroll;
+  }
+}

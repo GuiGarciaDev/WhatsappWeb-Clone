@@ -4,7 +4,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    color: var(--texts);
+    color: var(--text-secondary);
     border-bottom: 8px solid var(--down-border);
     pointer-events: none;
     
@@ -12,11 +12,12 @@
     h1 {
       font-size: 28px;
       margin-top: 50px;
-      color: var(--texts);
+      color: var(--text-primary);
     }
   
     span {
       font-size: 14px;
+      margin-top: 20px;
     }
 
     .down-advice {
@@ -25,6 +26,10 @@
       bottom: 25px;
       align-items: center;
       column-gap: 5px;
+
+      span {
+        margin: 0;
+      }
 
       img {
         height: 15px;

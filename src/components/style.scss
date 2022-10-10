@@ -3,7 +3,6 @@
     display: flex;
     width: 100%;
     align-items: center;
-    margin: 8px 0;
     padding-left: 10px;
     padding-right: 5px;
     border: 0;
@@ -21,9 +20,7 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-        
+        border-top: 1px solid var(--border);  
     
         .mid {
             display: flex;
@@ -32,21 +29,32 @@
             height: 70px;
             text-align: start;
 
+
             h1 {
                 color: var(--name);
                 font-size: 16px;
                 margin: 2px 0;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: 250px;
+                display: block;
+                overflow: hidden;
             }
 
             span {
                 font-size: 14px;
-                color: var(--text);
+                color: var(--text-secondary);
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: 250px;
+                display: block;
+                overflow: hidden;
             }
         }
     
         .end {
             display: flex;
-            color: var(--text);
+            color: var(--text-secondary);
             justify-self: flex-end;
 
             span {
@@ -62,6 +70,6 @@
     background-color: var(--card-hover);
 }
 
-.card-ative {
+.card-active {
     background-color: var(--card-focus);
 }

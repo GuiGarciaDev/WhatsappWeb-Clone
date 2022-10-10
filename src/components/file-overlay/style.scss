@@ -1,0 +1,27 @@
+
+.file-overlay-holder {
+    display: none;
+    position: absolute;
+    right: -120px;
+    justify-content: start;
+    width: 100px;
+    animation: show .3s linear;
+
+    .file-overlay {
+        transform-origin: left top;
+        padding: 5px 10px;
+        border-radius: 10px;
+        width: fit-content;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+}
+
+@keyframes show {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

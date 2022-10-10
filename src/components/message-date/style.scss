@@ -1,0 +1,16 @@
+
+.date-holder {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    width: fit-content;
+    padding: 5px 20px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background-color: var(--date-background);
+
+    span {
+        color: var(--text-secondary);
+    }
+}

@@ -1,0 +1,28 @@
+.config-card {
+    display: flex;
+    padding-left: 25px;
+    align-items: center;
+    color: var(--text-primary);
+    height: 60px;
+    column-gap: 25px;
+    cursor: pointer;
+
+    svg {
+        width: 30px;
+        height: 30px;
+        color: var(--icon-fixed);
+    }
+
+    span {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #E9EDEF20;
+        height: 60px;
+        width: 100%;
+        font-size: 17px;
+    }
+}
+
+.config-card:hover {
+    background-color: var(--card-hover);
+}

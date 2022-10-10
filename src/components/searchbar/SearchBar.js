@@ -1,31 +1,24 @@
-import { useState } from "react";
 import "./style.scss";
+import { useState } from "react";
+
+import { HiArrowLeft } from 'react-icons/hi';
+import { BsSearch } from 'react-icons/bs';
 
 export default function SearchBar({placeholder, arrowId, searchId}) {
 
-    const [select, setSelect] = useState(true);
-
-    function setFocus() {
-        setSelect(!select);
-
-        if (select) {
-            document.getElementById(searchId).className = "hidden";
-            document.getElementById(arrowId).className = "arrow-active";
-        } else {
-            document.getElementById(searchId).className = "search-icon-active";
-            document.getElementById(arrowId).className = "hidden";
-        } 
-    }
+    const [select, setSelect] = useState(false);
 
     return(
-        <div id="searchbar">
-            <button>
-                <img src="left-arrow.svg" alt=""  id={arrowId} className="hidden" onClick={() => setFocus()}></img>
+        <div id="searchbar"> 
+            <button id={arrowId} onClick={() => setSelect(false)} style={select ? {display: 'flex'} : {display: 'none'}}>
+                <HiArrowLeft className="arrow-icon"/>
             </button>
-            <button id={searchId} className="active">
-                <img src='search-icon.svg' alt='' onClick={() => setFocus()}></img>
+            
+            <button id={searchId} onClick={() => setSelect(true)} style={select ? {display: 'none'} : {display: 'flex'}}>
+                <BsSearch className="search-icon"/>   
             </button>
-            <input id="search-input" placeholder={placeholder} onFocus={()=>setFocus()} onBlur={()=>setFocus()}></input>
+            
+            <input id="search-input" placeholder={placeholder} onFocus={()=>setSelect(true)} onBlur={()=>setSelect(false)}></input>
         </div>
     )
 }
