@@ -1,27 +1,3 @@
-:root {
-  --background-right: #222e35;
-  --background-left: #111b21;
-  --background-friend-profile: #0c1317;
-  --bottom-searchBar: #2a3942;
-  --border: rgba(255, 255, 255, 0.077);
-  --card-hover: #202c33; 
-  --card-focus: #2a3942;
-  --date-background: #222e35;
-  --down-border: #008069;
-  --dropdown-background: #233138;
-  --dropdown-backgrouund-hover: #182229;
-  --group-img-background: #00a884;
-  --icon-fixed: #8696a0;
-  --link: #53bdeb;
-  --message-background: #005c4b;
-  --modal-background: #3b4a54;
-  --modal-border-button: #8696a026;
-  --modal-button-hover: #e9edef0d;
-  --modal-backdrop: #0b141ad9;
-  --name: rgba(239, 239, 239, 0.826);
-  --text-primary: #E9EDEF;
-  --text-secondary: #E9EDEF70;
-}
 
 * {
   padding: 0;
@@ -95,7 +71,6 @@
 
             button {
               border: 0;
-              width: 100%;
               padding: 7px 35px 7px 20px;
               text-align: start;
               white-space: nowrap;
@@ -115,6 +90,10 @@
       button {
         padding: 0;
         border-radius: 50%;
+        margin: 0;
+        border: 0;
+        background-color: transparent;
+
         .user-img {
           display: flex;
           width: 45px;
@@ -295,10 +274,15 @@
           margin-top: 4px;
           background-color: transparent;
           cursor: pointer;
-          filter: invert(100%) sepia(0%) saturate(7484%) hue-rotate(184deg) brightness(112%) contrast(97%);
         }
 
-        .name, .message, .name-edit, .message-edit {
+        svg {
+          width: 24px;
+          height: 24px;
+          fill: var(--icon-fixed);
+        }
+
+        .property, .property-edit {
           all: unset;
           color: white;
           caret-color: white;
@@ -309,7 +293,7 @@
           font-size: 14px;
         }
 
-        .name-edit, .message-edit {
+        .property-edit {
           width: 80%;
           border-bottom: 2px solid var(--down-border);
         }

@@ -1,60 +1,78 @@
 import './style.scss'
-import db from '../db.json';
-import Card from '../components/card'
-import { useState } from 'react'
+
+import Card from '../components/card';
 import DefaultPage from '../components/default-page/DefautlPage';
 import MessagePage from '../components/message-page/MessagePage';
 import SearchBar from '../components/searchbar/SearchBar';
-
-import { AiOutlineUserAdd, AiFillBell  } from 'react-icons/ai';
-import { BiShieldQuarter } from 'react-icons/bi';
-import { HiDocumentText } from 'react-icons/hi'; 
-import { IoMdHelpCircle } from 'react-icons/io'; 
-import { MdGroup, MdLock, MdBrightnessMedium } from 'react-icons/md'; 
-import { RiImageEditFill } from 'react-icons/ri'; 
-import { VscSymbolKey } from 'react-icons/vsc'; 
-
 import DropMenu from '../components/dropmenu/DropMenu'; 
 import LeftSideMenu from '../components/left-sidemenu/LeftSideMenu';
 import DividerLetter from '../components/divider-letter/DividerLetter';
 import ConfigCard from '../components/config-card/ConfigCard';
+import NewContactModal from '../components/new-contact-modal/NewContactModal';
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { firedb as db, storage } from '../firebase'
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { collection, doc, getDoc, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
+
+import { AiOutlineUserAdd, AiFillBell, AiOutlineCheck } from 'react-icons/ai';
+import { BiShieldQuarter } from 'react-icons/bi';
+import { HiDocumentText } from 'react-icons/hi'; 
+import { IoMdHelpCircle } from 'react-icons/io'; 
+import { MdGroup, MdLock, MdBrightnessMedium, MdModeEdit } from 'react-icons/md'; 
+import { RiImageEditFill } from 'react-icons/ri'; 
+import { VscSymbolKey } from 'react-icons/vsc'; 
+import { useEffect } from 'react';
+
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
 export default function App() {
 
+  // Front end
+
   const [messagePage, setMessagePage] = useState(false); // Controls the right column -> Talk page
   const [leftmenu, setLeftMenu] = useState(null);        // Controls the state of left menus
-  const [friendIndex, setFriendIndex] = useState(0);     // Send index of friend in db to talk page
 
-  const [edit, setEdit] = useState(false);
-  const [name, setName] = useState(false);
+
+  const [friendIndex, setFriendIndex] = useState('');     // Send index of friend in db to talk page
+
+  const [editName, setEditName] = useState(false);
+  const [editEmail, setEditEmail] = useState(false);
+  const [editStatus, setEditStatus] = useState(false);
   const [filter, setFilter] = useState(true);
-  const [hasFavorite, setHasFavorite] = useState(false);
+
+  const [newContactModal, setNewContactModal] = useState(false) // Open / close modal for add new contact
+  
+  //const [hasFavorite, setHasFavorite] = useState(false);
+  let hasFavorite = false; // Just for stop advide about non use setHasFavorite yet
 
   const [dropdown, setDropdown] = useState(null);
   
-  const editMessage = () => setEdit(!edit);
-  const editName = () => setName(!name);
-
   const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
   
   let numSaved = 0;
   let myImg = "pato.jpg";
-  let myName = 'Guilherme';
-  let myText = '1/8';
 
-  function changePage(idx) { // Search for better way to do this...
-    setFriendIndex(idx);
+  function changePage(email, idx) { // Search for better way to do this...
+    
+    const newChatId = currentUser.email > email 
+      ? currentUser.email + email
+      : email + currentUser.email
+
+    setFriendIndex(email);
     setMessagePage(true);
-
+    setChatId(newChatId)
+    
     const otherCards = document.getElementsByName("recentTalks"); // Picking all recent cards
 
-    for (let i = 0; i < db.length; i++) { // Restarting all cards ClassNames for "card"
+    for (let i = 0; i < contacts.length; i++) { // Restarting all cards ClassNames for "card"
       otherCards[i].className = "card";
     }
 
-    const card = document.getElementById("p"+idx); // Picking all recent cards of new talk
+    const card = document.getElementById(idx); // Picking all recent cards of new talk
     card.className = "card-active"; // The select card will have this className
   }
 
@@ -62,18 +80,38 @@ export default function App() {
     // TODO: 
   }
 
-  function previewImage() {
-    let file = document.getElementById("file").files;
+  function previewImage(file) { // handleUpload()
+    // let file = document.getElementById("file").files;
 
-    if (file.length > 0) {
-      let fileReader = new FileReader();
+    // if (file.length > 0) {
+    //   let fileReader = new FileReader();
 
-      fileReader.onload = function(event) {
-        document.getElementById("preview").setAttribute("src", event.target.result);
-      };
+    //   fileReader.onload = function(event) {
+    //     document.getElementById("preview").setAttribute("src", event.target.result);
+    //   };
 
-      fileReader.readAsDataURL(file[0]);
-    }
+    //   fileReader.readAsDataURL(file[0]);
+    // }
+    console.log(file.name);
+    // Verify if have img !img && alert('something')"
+
+    //allow read, write: if false; backup for storage rules
+
+    const storageRef = ref(storage, `/user-image/${file.name}`)
+    const uploadTask = uploadBytesResumable(storageRef, file)
+
+    uploadTask.on(
+      "state_changed",
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          updateDoc(userRef, {
+            photoUrl: url
+          })
+          console.log('probably worked');
+        })
+      }
+    )
+
   }
 
   function toggleFilter() {
@@ -87,13 +125,84 @@ export default function App() {
 
   }
 
+  // Back end
+
+  const [chatId, setChatId] = useState('')
+
+  const [error, setError] = useState('')
+  const { currentUser, logout } = useAuth()
+  const navigate = useNavigate()
+  
+  const [user, setUser] = useState([]) // users/user
+  const [contacts, setContacts] = useState([]) // users/user => other users tha you have added
+
+  const [email, setEmail] = useState('')
+
+  const userRef = doc(db, 'users', currentUser.email);
+  //const messagesRef = collection(db, "messages")
+  const contactsRef = collection(db, "users")
+
+  useEffect(() => {
+    onSnapshot(userRef, (snapshot) => {
+      setUser(snapshot.data());
+    })
+
+    const allUsers = query(contactsRef, where('id', '!=', currentUser.email))
+
+    onSnapshot(allUsers, (snapshot) => {
+      setContacts(snapshot.docs.map((contact) => ({...contact.data()})));
+    })
+
+  }, [])
+
+  async function addContact (email) {
+    const mycontactRef = doc(db, "users", currentUser.email, 'contacts', email);
+    const friendRef = doc(db, 'users', email);
+    setError('')
+
+    if (!(currentUser.email === email)) {
+      try {
+        const friendData = await getDoc(friendRef)
+        //setFriendInfo(friendData.data())
+  
+        setDoc(mycontactRef, { 
+          ...friendData.data() // Puttung all this data inside a new contact
+        })
+  
+      } catch (error) {
+        console.log(error);
+      }  
+    } else {
+      setError('Cannot add yourself!')
+      console.log('Cannot add yourself!');
+    }
+    setNewContactModal(false)
+  }
+    
+  const updateUser = async () => {
+    setDoc(userRef, {
+      ...user
+    }) 
+  }
+
+  async function handleLogout() {
+    setError('')
+
+    try {
+      await logout()
+      navigate('/login')
+    } catch {
+      setError('Failed to log out')
+    }
+  }
+
   return (
     <div id="page">
       <div className={"left-column"}>
 
         <div className="left-up">
           <button onClick={() => setLeftMenu('perfilMenu')}>
-            <img src="pato.jpg" alt='' className="user-img"></img>
+            <img src={user.photoUrl} alt='' className="user-img"></img>
           </button>
           <div className='up-icon-holder'>
             <button>
@@ -112,7 +221,7 @@ export default function App() {
                   <button onClick={() => setLeftMenu('joinGroup')}>Novo grupo</button>
                   <button onClick={() => setLeftMenu('favoriteMessageMenu')}>Mensagens favoritas</button>
                   <button onClick={() => setLeftMenu('config')}>Configurações</button>
-                  <button>Desconectar</button>
+                  <button onClick={() => handleLogout()}>Desconectar</button>
                 </DropMenu>
             </div>
           </div>
@@ -131,14 +240,14 @@ export default function App() {
           </div>
           
           <div className="content-holder">
-            { filter ? 
+            { filter ? //TODO: Check if the user have contact, if dont display some message with button
                 <>
                   {
-                    db.map((friend, idx) => {
+                    contacts.map((contact, idx) => {
                       return (
-                        <Card title={friend.name} content={friend.last_message} id={friend.id}
-                          date="Ontem" image="cute-cat.jpg" key={idx} name={"recentTalks"}
-                          order={() => changePage(idx)}
+                        <Card title={contact.name} content={contact.last_message} id={idx}
+                          date="Ontem" image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} key={idx} name={"recentTalks"}
+                          order={() => changePage(contact.email, idx)}
                         />
                       )
                     })
@@ -164,11 +273,11 @@ export default function App() {
 
         <LeftSideMenu id={'perfilMenu'} title={'Perfil'} toggler={leftmenu} closeFunction={() => setLeftMenu()}>
           <div id="inputImg-holder"> 
-            <img id="preview" src={myImg} alt=""></img>
+            <img id="preview" src={user.photoUrl} alt=""></img>
             <input
               type="file"
-              onChange={() => previewImage()}
-              accept=".png, image/jpeg"
+              onChange={(e) => previewImage(e.target.files[0])}
+              accept="/image/*"
               id="file"
             />
             <label htmlFor="file"></label>
@@ -178,15 +287,37 @@ export default function App() {
             <span>Seu nome</span>
 
             <div className='input-holder'>
-              <input className={name ? "name-edit" : "name"}
-                defaultValue={myName}
+              <input className={editName ? "property-edit" : "property"}
+                onChange={(e) => user.name = e.target.value}
+                defaultValue={user.name}
                 type="text"
-                readOnly={!name}
+                readOnly={!editName}
                 >
               </input>
-              <button onClick={() => editName()}>
-                <img src='edit.svg' alt=''></img>
-              </button>
+              {
+                editName ? 
+                <button onClick={() => {updateUser(); setEditName(false)}}><AiOutlineCheck/></button> 
+                : 
+                <button onClick={() => setEditName(true)}><MdModeEdit/></button>
+              }
+            </div>
+
+            <span>Seu email</span>
+
+            <div className='input-holder'>
+              <input className={editEmail ? "property-edit" : "property"}
+                onChange={(e) => user.email = e.target.value}
+                defaultValue={user.email}
+                type="text"
+                readOnly={!editEmail}
+                >
+              </input>
+              {
+                editEmail ? 
+                <button onClick={() => {updateUser(); setEditEmail(false)}}><AiOutlineCheck/></button>
+                : 
+                <button disabled={true} onClick={() => setEditEmail(true)}><MdModeEdit/></button>
+              }
             </div>
 
             <span className='txt'>
@@ -197,15 +328,19 @@ export default function App() {
             <span>Recado</span>
 
             <div className='input-holder'>
-              <input className={edit ? "message-edit" : "message"} 
-                defaultValue={myText}
+              <input className={editStatus ? "property-edit" : "property"} 
+                onChange={(e) => user.status = e.target.value}
+                defaultValue={user.status}
                 type="text"
-                readOnly={!edit}
+                readOnly={!editStatus}
                 >
                 </input>
-              <button onClick={() => editMessage()}>
-                <img src='edit.svg' alt=''></img>
-              </button>
+                {
+                  editStatus ? 
+                  <button onClick={() => {updateUser(); setEditStatus(false)}}><AiOutlineCheck/></button> 
+                  : 
+                  <button onClick={() => setEditStatus(true)}><MdModeEdit/></button>
+                }
             </div>
           </div>
         </LeftSideMenu>
@@ -224,7 +359,7 @@ export default function App() {
               </div>
               <span>Novo Grupo</span>
             </button>
-            <button className='nMessage-groupCard-holder'>
+            <button className='nMessage-groupCard-holder' onClick={() => setNewContactModal(true)}>
               <div className='groupCard-image-holder'>
                 <AiOutlineUserAdd/>
               </div>
@@ -234,26 +369,26 @@ export default function App() {
             <div className='nMessage-cards-map'>
               {
                 numSaved === 1 ? 
-                <span>
-                  Você ainda não tem contatos, tente 
-                  <a href='https://github.com/Guilherme-ds-Garcia'> adicionar </a> 
-                  alguns.
+                  <span>
+                    Você ainda não tem contatos, tente 
+                    <a href='https://github.com/Guilherme-ds-Garcia'> adicionar </a> 
+                    alguns.
                   </span> 
                 : 
-                alphabet.map((letter) => {
+                alphabet.map((letter, idx) => {
                   return (
                   <>
-                    <DividerLetter letter={letter}/>
+                    <DividerLetter letter={letter} key={idx}/>
                     {
-                      db.map((friend, idx) => {
+                      contacts.map((contact, idx) => {
                         return (
                           <>
                             {
-                              friend.name[0] === letter ?
-                              <Card title={friend.name} content={friend.status} id={"n"+friend.id}
+                              contact.name[0] === letter &&
+                              <Card title={contact.name} content={contact.status} id={"n"+idx}
                                 image="cute-cat.jpg" key={idx} 
                                 order={() => addConversation(idx)}
-                              /> : <></>
+                              />
                             }
                           </>
                         )
@@ -295,21 +430,21 @@ export default function App() {
           </div>
           <div className='jGroup-content'>
             {
-              alphabet.map((letter) => {
+              alphabet.map((letter, idx) => {
                 return (
                 <>
                   {
-                     <DividerLetter letter={letter}/>
+                     <DividerLetter letter={letter} key={idx}/>
                   }
                   {
-                    db.map((friend, idx) => {
+                    contacts.map((contact, idx) => {
                       return (
                         <>
                           {
-                            friend.name[0] === letter ?
-                            <Card title={friend.name} content={friend.status} id={"n"+friend.id}
+                            contact.name[0] === letter &&
+                            <Card title={contact.name} content={contact.status} id={"n"+idx}
                               image="cute-cat.jpg" key={idx} 
-                            /> : <></>
+                            />
                           }
                         </>
                       )
@@ -326,8 +461,8 @@ export default function App() {
           <button className='perfilButton' onClick={() => setLeftMenu('perfilMenu')}>
             <img src={myImg} alt=''></img>
             <div className='texts'>
-              <h3>{myName}</h3>
-              <span>{myText}</span>
+              <h3>{user.name}</h3>
+              <span>{user.status}</span>
             </div>
           </button>
           <ConfigCard title={'Notificações'}>
@@ -359,9 +494,22 @@ export default function App() {
 
       <div id="right-column">
         {
-          messagePage ? <MessagePage idx={friendIndex}/> : <DefaultPage/>
+          messagePage ? <MessagePage id={friendIndex} chatId={chatId}/> : <DefaultPage/>
         }
       </div>
+
+      <NewContactModal 
+        state={newContactModal} 
+        closeFunction={() => setNewContactModal(false)} 
+      >
+        <div className='email-holder'>
+            <input placeholder='Friend Email' type='email' onChange={(e) => setEmail(e.target.value)}/>
+        </div>
+        <div className="button-holder">
+            <button onClick={() => setNewContactModal(false)}>CANCELAR</button>
+            <button className='confirmButton' onClick={() => addContact(email)}>ADICIONAR</button>
+        </div>
+      </NewContactModal>
     </div>
   )
 }

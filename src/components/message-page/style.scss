@@ -7,6 +7,7 @@
     
     .message-content-holder {
         display: flex;
+        position: relative;
         width: 100%;
         overflow: hidden;
         flex-direction: column;
@@ -37,6 +38,7 @@
                         margin-left: 20px;
                         border-radius: 50%;
                         margin-right: 20px;
+                        animation: imageT 50ms linear;
                     }
         
                     .text-holder {
@@ -133,11 +135,12 @@
             display: flex;
             position: relative;
             flex-direction: column;
-            overflow-y: scroll;
+            overflow-y: auto;
             row-gap: 2px;
             padding: 20px 40px;
+            margin-bottom: 60px;
             width: 100%;
-            height: 600px;
+            height: 100%;
             background: url("../../../public/wppWalpaper.jpg");
             background-size: 350px;
             color: white;
@@ -145,6 +148,8 @@
     
         .bottom {
             display: flex;
+            bottom: 0;
+            position: absolute;
             align-items: center;
             width: 100%;
             height: 60px;
@@ -191,6 +196,17 @@
                     position: absolute;
                     row-gap: 15px;
                     bottom: 70px;
+                    z-index: 0;
+                    animation: holderY 100ms linear;
+
+                    @keyframes holderY {
+                        0% {
+                            transform: translateY(100px);
+                        }
+                        100% {
+                            transform: translateY(0px);
+                        }
+                    }
 
                     button {
                         display: flex;
@@ -201,6 +217,19 @@
                         width: 50px;
                         height: 50px;
                         border-radius: 100%;
+                        animation: showButton 300ms linear;
+
+                        @keyframes showButton {
+                            0% {
+                                transform: scale(0);
+                            }
+                            60% {
+                                transform: scale(1.3);
+                            }
+                            100% {
+                                transform: scale(1);
+                            }
+                        }
 
                         span {
                             align-self: flex-start;

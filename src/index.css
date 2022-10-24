@@ -1,3 +1,34 @@
+:root {
+  --auth-border: #ffffff50;
+  --background-right: #222e35;
+  --background-left: #111b21;
+  --background-friend-profile: #0c1317;
+  --background-confirmButton-modal: #00a884;
+  --background-confirmButtonHover-modal: #06cf9c;
+  --bottom-searchBar: #2a3942;
+  --border: rgba(255, 255, 255, 0.077);
+  --card-hover: #202c33; 
+  --card-focus: #2a3942;
+  --date-background: #222e35;
+  --down-border: #008069;
+  --dropdown-background: #233138;
+  --dropdown-backgrouund-hover: #182229;
+  --error-text: #e65f5f;
+  --group-img-background: #00a884;
+  --icon-fixed: #8696a0;
+  --link: #53bdeb;
+  --message-background: #005c4b;
+  --modal-background: #3b4a54;
+  --modal-border-button: #8696a026;
+  --modal-button-hover: #e9edef0d;
+  --modal-backdrop: #0b141ad9;
+  --name: rgba(239, 239, 239, 0.826);
+  --text-primary: #E9EDEF;
+  --text-secondary: #E9EDEF70;
+  --text-confirmButton-modal: #111b21;
+  --text-cancelButton-modal: #00a884;
+}
+
 body {
   margin: 0;
   height: 100vh;

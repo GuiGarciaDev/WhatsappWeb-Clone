@@ -1,0 +1,138 @@
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--background-left);
+
+    .login-container {
+        display: flex;
+        position: relative;
+        align-items: center;
+        flex-direction: column;
+        padding: 40px 50px;
+        border-radius: 25px;
+        row-gap: 20px;
+        border: 3px solid var(--auth-border);
+        background-color: transparent;
+
+        .login-image-holder {
+            display: flex;
+            position: absolute;
+            width: fit-content;
+            padding: 20px;
+            top: -50px;
+            left: 36%;
+            border-radius: 50px;
+            border: 3px solid var(--auth-border);
+            z-index: 1;
+            background-color: var(--background-left);
+
+            svg {
+                fill: var(--background-confirmButton-modal);
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        h1 {
+            margin: 20px 0 5px 0;
+            font-size: 25px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        span {
+            display: flex;
+            margin: 0;
+            padding: 5px 10px;
+            border-radius: 7px;
+            border: 1px solid var(--auth-border);
+            background-color: var(--background-right);
+            color: var(--error-text);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+
+            p {
+                color: var(--text-primary);
+            }
+        }
+
+        .email-holder, .password-holder {
+            display: flex;
+            align-items: stretch;
+            //padding: 15px 0;
+            border-radius: 5px;
+            background-color: var(--background-right);
+
+            .login-icon-holder {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 50px;
+                height: 40px;
+                background-color: var(--background-right);
+
+                svg {
+                    width: 20px;
+                    height: 20px;
+                    fill: var(--icon-fixed);
+                }
+            }
+
+            input {
+                border: 0;
+                all: unset;
+                caret-color: white;
+                color: white;
+                width: 100%;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                font-size: 16px;
+                padding: 0 10px;
+            }
+        }
+
+        button {
+            border: 0;
+            width: 100%;
+            transition: .15s linear;
+            padding: 15px 0;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .login-button {
+            margin-top: 20px;
+            background-color: var(--background-confirmButton-modal);
+            color: var(--text-confirmButton-modal);
+        }
+
+        .login-button:hover {
+            background-color: var(--background-confirmButtonHover-modal);
+        }
+
+        a {
+            width: 100%;
+            
+            .register-button {
+                background-color: transparent;
+                border: 1px solid var(--text-cancelButton-modal);
+                color: var(--text-cancelButton-modal);
+            }
+
+            .register-button:hover {
+                background-color: var(--modal-button-hover);
+                border: 1px solid var(--text-cancelButton-modal);
+                
+            }
+        }
+    }
+}

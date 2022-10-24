@@ -1,0 +1,66 @@
+.deleteModalConversation-content {
+    display: flex;
+    flex-direction: column;
+    width: 480px;
+    padding: 10px;
+    row-gap: 20px;
+
+    h2 {
+        color: var(--text-primary);
+        font-weight: 400;
+        font-size: 20px;
+    }
+
+    .checkdiv {
+        display: flex;
+        align-items: center;
+        column-gap: 18px;
+        color: var(--text-primary);
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    span {
+        color: var(--text-secondary);
+        font-size: 14px;
+        white-space: pre-wrap;
+    }
+
+    .button-holder {
+        display: flex;
+        width: 100%;
+        margin-top: 30px;
+        justify-content: flex-end;
+        align-self: flex-end;
+        column-gap: 10px;
+
+        button {
+            color: var(--text-cancelButton-modal);
+            width: fit-content;
+            padding: 12px 26px;
+            margin: 0;
+            border: 1px solid var(--modal-border-button);
+            background-color: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .3s ease;
+        }
+
+        button:hover {
+            background-color: var(--modal-button-hover);
+        }
+
+        .confirmButton {
+            color: var(--text-confirmButton-modal);
+            background-color: var(--background-confirmButton-modal);
+        }
+
+        .confirmButton:hover {
+            color: var(--text-confirmButton-modal);
+            background-color: var(--background-confirmButtonHover-modal);
+        }
+    }
+}
