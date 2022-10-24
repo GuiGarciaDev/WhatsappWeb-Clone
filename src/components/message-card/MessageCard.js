@@ -3,13 +3,11 @@ import db from '../../db.json';
 
 import { BsCheckAll } from 'react-icons/bs';
 
-export default function MessageCard({ friendIndex, messageIndex, content, time, isRead, children }) { 
-    const friend = db[friendIndex];
-    const message = friend.messages[messageIndex];
+export default function MessageCard({ id, content, time, isRead, children, isMy }) { 
 
     return (
         <>
-            <div id={message.id} className="message-card" style={{alignSelf: 'flex-end'}}>
+            <div id={id} className="message-card" style={isMy ? {alignSelf: 'flex-end'} : {alignSelf: 'flex-start'}}>
                 <div className='message-card-content'>
                     <p>{content}</p>
                 </div>

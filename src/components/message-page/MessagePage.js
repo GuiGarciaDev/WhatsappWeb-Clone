@@ -1,8 +1,10 @@
 import "../message-page/style.scss";
-
-import db from '../../db.json';
-import React, { useState } from "react";
+import { firedb as db } from "../../firebase";
+import React, { useEffect, useState } from "react";
 import Modal from 'react-modal';
+import { customStyles } from "../../modalSettings";
+import { denunceTextModal } from "../../modalSettings";
+import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
 
 import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
@@ -10,105 +12,125 @@ import MessageDate from "../message-date/MessageDate";
 import MessageCard from "../message-card/MessageCard";
 import DropMenu from "../dropmenu/DropMenu";
 import RightSideMenu from "../right-sidemenu/RightSideMenu";
+import FileOverlay from "../file-overlay/FileOverlay";
 
 import { BsFillImageFill, BsCameraFill } from 'react-icons/bs';
 import { IoMdDocument, IoIosArrowDown } from 'react-icons/io';
 import { HiUser } from 'react-icons/hi';
 import { RiStickyNoteFill } from 'react-icons/ri';
 import { FaArrowRight, FaMicrophone } from 'react-icons/fa';
-import FileOverlay from "../file-overlay/FileOverlay";
+import TwoOptionsModal from "../2opt-modal/TwoOptionsModal";
+import { useAuth } from "../../contexts/AuthContext";
 
-// TODO: Aperfeiçoar o chat de mensagens
-// Fazer com que o MessageDate seja automático
-// Implementar funções que façam o projeto funcionar
-// dentre elas: adicionar mensagens, etc
-
-// Default image for all users
-let user_image = "cute-cat.jpg";
-
-const customStyles = {
-    overlay: {
-        backgroundColor: 'var(--modal-backdrop)',
-    },
-
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      border: 0,
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      backgroundColor: 'var(--modal-background)',
-    },
-  };
-
-export default function MessagePage({ idx }) {
-    const [searchmessageMenu, setSearchMessageMenu] = useState(false);
-    const [friendMenu, setFriendMenu] = useState(false);  
+export default function MessagePage({ id, chatId }) { 
+    const [rightmenu, setRightMenu] = useState(null);
 
     const [filedropup, setFileDropup] = useState(false);
     const [searchbarlength, setSearchBarLength] = useState(0); // Control the toggle of mic button and send button
-    const [modalDelete, setModalDelete] = useState(false);
 
     const [dropdown, setDropdown] = useState(null);
 
     const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
-    
     const toggleFileDropup = () => setFileDropup(!filedropup);
 
-    const openModal = () => setModalDelete(true);
-    const closeModal = () => setModalDelete(false);
+    const [modalDelete, setModalDelete] = useState(false); // Modal for delete specific message
+    const [modalBlock, setModalBlock] = useState(false); // Modal for delete all messages
+    const [modalDenunce, setModalDenunce] = useState(false); // Modal for delete all messages
+    const [modalDeleteConversation, setModalDeleteConversation] = useState(false); // Modal for delete all messages
 
-    const friend = db[idx];
+    const { currentUser } = useAuth()
+    
+    const [contact, setContact] = useState('')
+    const [messages, setMessages] = useState([])
 
-      function sendMessage() { // Send message to your friend
-        const today = new Date();
-        const time = today.getHours() + ":" + today.getMinutes();
+    const contactRef = doc(db, "users", id)
+    const messagesRef = collection(db, "chat", chatId, 'messages')
 
-        const searchbar = document.getElementById("bottom-messageBar");
+    console.log();
 
-        const newMessage = {
-            "id": "m" + friend.messages.length,
-            "content": searchbar.value,
-            "time": time,
-            "read": true
-        }
+    useEffect(() => {
+        onSnapshot(contactRef, orderBy('time', 'desc'), (snapshot) => {
+          setContact(snapshot.data());
+        })
+
+        const q = query(messagesRef, orderBy('date', 'asc'))
+
+        onSnapshot(q, (snapshot) => { // To implement delete message just for current user try to use where(cleared = true) in query
+            setMessages(snapshot.docs.map((message) => (message.data())));
+        })
+
+        // onSnapshot(messagesRef, (snapshot) => {
+        //     setMessages(snapshot.docs.map((message) => ({...message.data()})));
+        // })
+    
+      }, [id])
+
+    // Default image for all users
+    const user_image = contact.photoUrl ? contact.photoUrl : "noImage.png";
+
+    function sendMessage( chatId ) { // Send message to your friend
+        const dateC = new Date();
+
+        const minutes = ("0" + dateC.getMinutes()).slice(-2)
+        const hours = ("0" + dateC.getHours()).slice(-2) + ":"
+        const day = ("0" + dateC.getDate()).slice(-2) + "/"
+        const month = ("0" + dateC.getMonth()).slice(-2) + "/"
+        const year = dateC.getFullYear() + "/"
+
+        const time = hours + minutes
+        const date = year + month + day + hours + minutes
+
+        const chatMessages = collection(db, "chat", chatId, 'messages')
+
+        const searchbar = document.getElementById("bottom-messageBar")
 
         if (searchbar.value.length > 0) {
-            friend.messages.push(newMessage);
+            addDoc(chatMessages, { // Message sent to chatId room
+                "content": searchbar.value,
+                "time": time,
+                //"id": this.id,
+                "date": date,
+                "read": true, // Default value for now
+                "autor": currentUser.email,
+                "for": id,
+            })
+
+            updateDoc(contactRef, {
+                "last_message": searchbar.value
+            })
+
             searchbar.value = "";
             setSearchBarLength(0);
         }
-      }
+    }
 
-      function inputControler() {
-        let seachbar = document.getElementById("bottom-messageBar");
-        let searchbarLength = seachbar.value.length;
+    function inputControler( chatId ) {
+    let seachbar = document.getElementById("bottom-messageBar");
+    let searchbarLength = seachbar.value.length;
 
-        if (searchbarLength > 0) {
-            seachbar.addEventListener("keydown", (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-        }
+    if (searchbarLength > 0) {
+        seachbar.addEventListener("keydown", (e) => {
+            if (e.key === 'Enter') {
+                sendMessage( chatId );
+            }
+        });
+    }
 
-        setSearchBarLength(searchbarLength);
-      }
+    setSearchBarLength(searchbarLength);
+    }
 
     return(
         <div className="message-page">
             <div className="message-content-holder">
                 <section id="header">
-                    <button className="header-button" onClick={() => setFriendMenu(true)}>
+                    <button className="header-button" onClick={() => setRightMenu('friendMenu')}>
                         <div className="block-start">
                             <img src={user_image} alt=""></img>
                             <div className="text-holder">
-                                <h1>{friend.name}</h1>
+                                <h1>{contact.name}</h1>
                                 <span>
                                     {
-                                        friend.online ? "online" : "visto por último online às " + friend.last_connection
+                                        contact.online ? "online" : "visto por último online às " + contact.last_connection
                                     }
                                 </span>
                             </div>
@@ -116,7 +138,7 @@ export default function MessagePage({ idx }) {
                     </button>
 
                     <div className="block-end">
-                        <button onClick={() => setSearchMessageMenu(true)}>
+                        <button onClick={() => setRightMenu('searchMessage')}>
                             <img id="srch"src="search-icon.svg" alt=""></img>
                         </button>
                         <div className='rightDropdown-holder'>
@@ -126,7 +148,7 @@ export default function MessagePage({ idx }) {
                                 <img src="3dots.svg" alt='' id="icon3"></img>
                             </button>
                             <DropMenu id={'rightDropdown'} classname={'dropdown'} toggler={dropdown} order={() => setDropdown()}>
-                                <button>Dados do contato</button>
+                                <button onClick={() => setRightMenu('friendMenu')}>Dados do contato</button>
                                 <button>Selecionar mensagens</button>
                                 <button>Silenciar notificações</button>
                                 <button>Limpar mensagens</button>
@@ -139,11 +161,12 @@ export default function MessagePage({ idx }) {
                 <section id="chatbox">
                     <MessageDate date={'today'}/>
                     {
-                        db[idx].messages.map((message, messageIdx) => {
-                            const dropdownId = 'mdd'+messageIdx;
+                        messages.map((message, idx) => {
+                            const dropdownId = 'mdd'+idx;
                             return (
-                                <MessageCard friendIndex={idx} messageIndex={messageIdx} content={message.content} 
-                                    time={message.time} isRead={message.read} key={messageIdx}
+                                <MessageCard id={idx} content={message.content} 
+                                    time={message.time} isRead={message.read} 
+                                    key={idx} isMy={message.autor === currentUser.email}
                                 >
                                     <button className='message-card-dropbutton' onClick={() => setDropdown(dropdownId)} 
                                         style={ dropdown === dropdownId ? {display: "flex", opacity: '1'} : {}}
@@ -158,7 +181,7 @@ export default function MessagePage({ idx }) {
                                         <button>Encaminhar mensagem</button>
                                         <button>Favoritar mensagem</button>
                                         <button>Denunciar</button>
-                                        <button onClick={() => {openModal(); setDropdown(null)}}>Apagar mensagem</button>
+                                        <button onClick={() => {setModalDelete(true); setDropdown(null)}}>Apagar mensagem</button>
                                     </DropMenu>
                                 </MessageCard>
                             )
@@ -212,14 +235,14 @@ export default function MessagePage({ idx }) {
 
                     <div className="bottom-messageBar-holder">
                         <input id="bottom-messageBar" placeholder="Digite uma mensagem..." 
-                            onChange={() => inputControler()}
+                            onChange={() => inputControler(chatId)}
                         >  
                         </input>
                     </div>
 
                     <div className="bottom-end">
                         <button style={{marginRight: '10px'}}
-                            onClick={() => sendMessage()}
+                            onClick={() => sendMessage(chatId)}
                         >
                             {
                                 searchbarlength > 0 ?
@@ -232,16 +255,16 @@ export default function MessagePage({ idx }) {
                 </section>
             </div>
 
-            <RightSideMenu title={'Dados do Contato'} toggler={friendMenu} closeFunction={() => setFriendMenu()}>
+            <RightSideMenu id={'friendMenu'} title={'Dados do Contato'} toggler={rightmenu} closeFunction={() => setRightMenu()}>
                 <section id="friend-Mid">
                     <div className="profile-image-name">
                         <img src={user_image} alt=""></img>
-                        <h2>{friend.name}</h2>
-                        <span>{friend.number}</span>
+                        <h2>{contact.name}</h2>
+                        <span>{contact.email}</span>
                     </div>
                     <div className="profile-message">
                         <span>Recado</span>
-                        <span className="profile-text">{friend.status}</span>
+                        <span className="profile-text">{contact.status}</span>
                     </div>
                     <div className="profile-files">
                         <button className="file-frow">
@@ -266,30 +289,35 @@ export default function MessagePage({ idx }) {
                             subtitle="As mensagens são protegidas com a criptografia de ponta a ponta.
                             Clique para confirmar"
                         />
-                        <ProfileButton icon="denied.svg" title={"Bloquear " + friend.name} red={true} name={'red'}
+                        <ProfileButton icon="denied.svg" title={"Bloquear " + contact.name} red={true} name={'red'}
+                            funct={() => setModalBlock(true)}
                         />
-                        <ProfileButton icon="dislike.svg" title={"Denunciar " + friend.name} red={true} name={"red"}
+                        <ProfileButton icon="dislike.svg" title={"Denunciar " + contact.name} red={true} name={"red"}
+                            funct={() => setModalDenunce(true)}
                         />
                         <ProfileButton icon="trash.svg" title={"Apagar Conversa"} red={true} name={'red'}
+                            funct={() => setModalDeleteConversation(true)}
                         />
                     </div>
                 </section>
             </RightSideMenu>                  
 
-            <RightSideMenu title={'Pesquisar Mensagens'} toggler={searchmessageMenu} closeFunction={() => setSearchMessageMenu()}>
+            <RightSideMenu id={'searchMessage'} title={'Pesquisar Mensagens'} toggler={rightmenu} 
+                closeFunction={() => setRightMenu()}
+            >
                 <section id="search-Mid">
                     <div className="search-searchbar-holder">
                         <SearchBar placeholder="Pesquisar..."
                             arrowId={"rightC-arrow"} searchId={"rightC-search"}
                         />
                     </div>
-                    <span className="search-span">Pesquisar mensagens com {friend.name}</span>
+                    <span className="search-span">Pesquisar mensagens com {contact.name}</span>
                 </section>
             </RightSideMenu>
 
             <Modal
                 isOpen={modalDelete}
-                onRequestClose={closeModal}
+                onRequestClose={() => setModalDelete(false)}
                 style={customStyles}
                 contentLabel="Example Modal"
                 shouldCloseOnOverlayClick={false}
@@ -300,10 +328,33 @@ export default function MessagePage({ idx }) {
                     <div className="button-holder">
                         <button>APAGAR PARA TODOS</button>
                         <button>APAGAR PARA MIM</button>
-                        <button onClick={() => closeModal()}>CANCELAR</button>
+                        <button onClick={() => setModalDelete(false)}>CANCELAR</button>
                     </div>
                 </div>
             </Modal>
+
+            <TwoOptionsModal 
+                title={'Deseja apagar esta conversa?'} 
+                confirmButton={'APAGAR CONVERSA'} 
+                cancelButton={'CANCELAR'}
+                text={'As mensagens serão removidas somente deste aparelho e dos seus aparelhos que usam versões mais recentes do WhatsApp.'}
+                state={modalDeleteConversation} 
+                closeFunction={() => setModalDeleteConversation(false)} 
+            />
+
+            <TwoOptionsModal 
+                title={`Deseja denunciar este contato ao WhatsApp?`} 
+                confirmButton={'DENUNCIAR'} cancelButton={'CANCELAR'}
+                state={modalDenunce} closeFunction={() => setModalDenunce(false)} 
+                text={denunceTextModal} check={true}
+            />
+
+            <TwoOptionsModal 
+                title={`Deseja bloquear ${contact.name}?`}
+                confirmButton={'BLOQUEAR'} cancelButton={'CANCELAR'}
+                text={'Contatos bloqueados não poderão mais fazer chamadas nem enviar mensagens para você.'}
+                state={modalBlock} closeFunction={() => setModalBlock(false)} 
+            />
         </div>
     )
 }

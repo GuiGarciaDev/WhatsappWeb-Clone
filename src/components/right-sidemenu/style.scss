@@ -4,6 +4,8 @@
     flex-direction: column;
     overflow-y: scroll;
     width: 400px;
+    max-height: 100vh;
+    $height: 100vh;
     right: 0;
     background-color: var(--background-left);
     font-size: 14px;
@@ -14,7 +16,7 @@
       display: flex;
       align-items: center;
       width: 100%;
-      height: 74px;
+      height: 84px;
       padding-left: 20px;
       column-gap: 20px;
       color: white;
@@ -44,7 +46,7 @@
 
   .sidebarRight-Content {
     display: flex;
-    height: calc(721.6px - 74px);
+    height: $height;
     flex-direction: column;
     overflow-y: scroll;
   }
