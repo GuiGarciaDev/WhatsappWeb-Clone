@@ -1,5 +1,7 @@
 import "./style.scss";
 
+import { MdLock } from 'react-icons/md'; 
+
 export default function DefaultPage() {
     return(
         <div className="all">
@@ -11,7 +13,7 @@ export default function DefaultPage() {
                 Use o WhatsApp em até quatro aparelhos conectados e um celular ao mesmo tempo.
             </span>
             <div className='down-advice'>
-                <img src='lock.svg' alt='' ></img>
+                <MdLock />
                 <span>Protegido com criptografia de ponta a ponta</span>
             </div>
         </div>

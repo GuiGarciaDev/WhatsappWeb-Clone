@@ -24,7 +24,7 @@
       height: fit-content;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 5px 12px 5px;
+      padding: 17px 5px 12px 5px;
       background-color: var(--background-right);
 
       .up-icon-holder {
@@ -34,8 +34,7 @@
           display: flex;
           border: 0;
           padding: 10px;
-          margin-left: 5px;
-          margin-right: 5px;
+          margin: 0 5px;
           background-color: transparent;
 
           #icon1, #icon2, #icon3 {
@@ -83,6 +82,13 @@
             button:hover {
               background-color: var(--dropdown-backgrouund-hover);
             }
+          }
+        }
+
+        @media (max-width: 750px) {
+          button {
+            padding: 6px;
+            margin: 0 6px;
           }
         }
       }
@@ -184,6 +190,12 @@
               text-align: center;
             }
 
+            @media (max-width: 750px) {
+              span {
+                font-size: 14px;
+              }
+            }
+
             button {
               border: 0;
               padding: 0;
@@ -215,6 +227,30 @@
               color: var(--link);
             }
           }
+        }
+      }
+
+      @media (max-width: 880px) {
+        .content-holder {
+          width: 350px;
+        }
+      }
+
+      @media (max-width: 800px) {
+        .content-holder {
+          width: 300px;
+        }
+      }
+
+      @media (max-width: 750px) {
+        .content-holder {
+          width: 250px;
+        }
+      }
+
+      @media (max-width: 630px) {
+        .content-holder {
+          width: 100%;
         }
       }
     }
@@ -439,13 +475,34 @@
     }
   }
 
-  
-
   #right-column {
     display: flex;
     height: 100%;
-    width: 100vw;
+    width: 100%;
     border-left: 1px solid rgba(255, 255, 255, 0.15);
   }
-}
 
+  @media (max-width: 880px) {
+    .left-column {
+      width: 350px;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .left-column {
+      width: 300px;
+    }
+  }
+
+  @media (max-width: 750px) {
+    .left-column {
+      width: 250px;
+    }
+  }
+
+  @media (max-width: 630px) {
+    .left-column {
+      width: 100%;
+    }
+  }
+}

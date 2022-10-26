@@ -2,12 +2,12 @@
     display: flex;
     position: absolute;
     flex-direction: column;
+    overflow-y: auto;
     height: 100%;
-    width: 400px;
     left: 0;
     background-color: var(--background-left);
     font-size: 14px;
-    transition: .7s ease; 
+    transition: all .7s ease; 
     z-index: 2;
     
     .up {
@@ -16,7 +16,7 @@
         column-gap: 30px;
         height: 100px;
         padding: 60px 0 25px 20px;
-        background-color: var(--background-right);       
+        background-color: var(--background-right);
 
         button {
             padding: 0;
@@ -46,5 +46,35 @@
         flex-direction: column;
         overflow-y: auto;
         padding-bottom: 30px;
+    }
+}
+
+@media (min-width: 881px) {
+    .sidebarLeft {
+        width: 400px;
+    }
+}
+
+@media (max-width: 880px) {
+    .sidebarLeft {
+        width: 350px;
+    }
+}
+
+@media (max-width: 800px) {
+    .sidebarLeft {
+        width: 300px;
+    }
+}
+
+@media (max-width: 750px) {
+    .sidebarLeft {
+        width: 250px;
+    }
+}
+
+@media (max-width: 630px) {
+    .sidebarLeft {
+        width: 100%;
     }
 }

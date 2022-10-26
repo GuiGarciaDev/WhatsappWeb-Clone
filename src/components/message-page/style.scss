@@ -31,6 +31,15 @@
         
                 .block-start {
                     display: flex;
+
+                    svg {
+                        fill: var(--icon-fixed);
+                        width: 20px;
+                        height: 20px;
+                        align-self: center;
+                        margin-left: 15px;
+                        transition: .3s ease;
+                    }
         
                     img {
                         width: 45px;

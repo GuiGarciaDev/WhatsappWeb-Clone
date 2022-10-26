@@ -54,7 +54,6 @@ export default function App() {
   const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
   
   let numSaved = 0;
-  let myImg = "pato.jpg";
 
   function changePage(email, idx) { // Search for better way to do this...
     
@@ -81,22 +80,6 @@ export default function App() {
   }
 
   function previewImage(file) { // handleUpload()
-    // let file = document.getElementById("file").files;
-
-    // if (file.length > 0) {
-    //   let fileReader = new FileReader();
-
-    //   fileReader.onload = function(event) {
-    //     document.getElementById("preview").setAttribute("src", event.target.result);
-    //   };
-
-    //   fileReader.readAsDataURL(file[0]);
-    // }
-    console.log(file.name);
-    // Verify if have img !img && alert('something')"
-
-    //allow read, write: if false; backup for storage rules
-
     const storageRef = ref(storage, `/user-image/${file.name}`)
     const uploadTask = uploadBytesResumable(storageRef, file)
 
@@ -107,7 +90,6 @@ export default function App() {
           updateDoc(userRef, {
             photoUrl: url
           })
-          console.log('probably worked');
         })
       }
     )
@@ -124,6 +106,26 @@ export default function App() {
     }
 
   }
+
+  // Responsive width
+  const [windowSize, setWindowSize] = useState(getWindowSize());
+
+  function getWindowSize() {
+     const {innerWidth, innerHeight} = window
+     return {innerWidth, innerHeight}
+  }
+
+  useEffect(() => {
+     function handleWindowResize() {
+         setWindowSize(getWindowSize())
+     }
+
+     window.addEventListener('resize', handleWindowResize)
+
+     return () => {
+         window.removeEventListener('resize', handleWindowResize)
+     }
+  }, [])
 
   // Back end
 
@@ -198,7 +200,7 @@ export default function App() {
 
   return (
     <div id="page">
-      <div className={"left-column"}>
+      <div className={"left-column"} style={messagePage && windowSize.innerWidth <= 630 ? {width: '0'} : {}}>
 
         <div className="left-up">
           <button onClick={() => setLeftMenu('perfilMenu')}>
@@ -459,7 +461,7 @@ export default function App() {
 
         <LeftSideMenu id={'config'} title={'Configurações'} toggler={leftmenu} closeFunction={() => setLeftMenu()}>
           <button className='perfilButton' onClick={() => setLeftMenu('perfilMenu')}>
-            <img src={myImg} alt=''></img>
+            <img src={user.photoUrl} alt=''></img>
             <div className='texts'>
               <h3>{user.name}</h3>
               <span>{user.status}</span>
@@ -492,9 +494,9 @@ export default function App() {
         </LeftSideMenu>
       </div>
 
-      <div id="right-column">
+      <div id="right-column" style={messagePage && windowSize.innerWidth < 630 ? {width: '100%'} : windowSize.innerWidth > 630 ? {width: '100%'} : {width: '0'}}>
         {
-          messagePage ? <MessagePage id={friendIndex} chatId={chatId}/> : <DefaultPage/>
+          messagePage ? <MessagePage id={friendIndex} chatId={chatId} closeFunction={setMessagePage}/> : <DefaultPage/>
         }
       </div>
 

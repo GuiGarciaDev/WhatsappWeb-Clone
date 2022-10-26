@@ -40,28 +40,6 @@ root.render(
 
 
 /* 
-# 13/10
- First tentative to implement firebase
- Created firebase project 
-
-# 14/40
- Added Login and Register page
- Added React Router to move through pages
-
-# 16/10
- Added Firebase Auth
- Register/login with email and password
- Added PrivateRoute to auth
- 
-# 17/10
- Added reset password and profile update
- Need to do db provider 
-
- # 18/10
-  Left Column is now listening db
-
- # 19/10
-  Right Column is now listening db
-  Need to make the functions work again
+a
             
 */

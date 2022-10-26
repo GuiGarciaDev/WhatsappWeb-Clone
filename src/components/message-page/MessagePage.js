@@ -16,13 +16,13 @@ import FileOverlay from "../file-overlay/FileOverlay";
 
 import { BsFillImageFill, BsCameraFill } from 'react-icons/bs';
 import { IoMdDocument, IoIosArrowDown } from 'react-icons/io';
-import { HiUser } from 'react-icons/hi';
+import { HiUser, HiArrowLeft } from 'react-icons/hi';
 import { RiStickyNoteFill } from 'react-icons/ri';
 import { FaArrowRight, FaMicrophone } from 'react-icons/fa';
 import TwoOptionsModal from "../2opt-modal/TwoOptionsModal";
 import { useAuth } from "../../contexts/AuthContext";
 
-export default function MessagePage({ id, chatId }) { 
+export default function MessagePage({ id, chatId, closeFunction }) { 
     const [rightmenu, setRightMenu] = useState(null);
 
     const [filedropup, setFileDropup] = useState(false);
@@ -45,8 +45,6 @@ export default function MessagePage({ id, chatId }) {
 
     const contactRef = doc(db, "users", id)
     const messagesRef = collection(db, "chat", chatId, 'messages')
-
-    console.log();
 
     useEffect(() => {
         onSnapshot(contactRef, orderBy('time', 'desc'), (snapshot) => {
@@ -125,6 +123,7 @@ export default function MessagePage({ id, chatId }) {
                 <section id="header">
                     <button className="header-button" onClick={() => setRightMenu('friendMenu')}>
                         <div className="block-start">
+                            { window.innerWidth < 630 && <HiArrowLeft onClick={() => closeFunction(false)}/>}
                             <img src={user_image} alt=""></img>
                             <div className="text-holder">
                                 <h1>{contact.name}</h1>

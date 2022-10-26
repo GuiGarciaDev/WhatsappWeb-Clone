@@ -2,6 +2,7 @@
 .card, .card-active {
     display: flex;
     width: 100%;
+    min-width: 250px;
     align-items: center;
     padding-left: 10px;
     padding-right: 5px;
@@ -20,7 +21,7 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
-        border-top: 1px solid var(--border);  
+        border-top: 1px solid var(--border);
     
         .mid {
             display: flex;
@@ -29,24 +30,21 @@
             height: 70px;
             text-align: start;
 
-
             h1 {
                 color: var(--name);
                 font-size: 16px;
-                margin: 2px 0;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                width: 250px;
-                display: block;
-                overflow: hidden;
+                margin: 2px 0; 
             }
 
             span {
                 font-size: 14px;
                 color: var(--text-secondary);
+            }
+
+            h1, span {
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                width: 250px;
+                width: 100%;
                 display: block;
                 overflow: hidden;
             }
