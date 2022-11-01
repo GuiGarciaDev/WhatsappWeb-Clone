@@ -1,6 +1,6 @@
 import "../message-page/style.scss";
 import { firedb as db } from "../../firebase";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Modal from 'react-modal';
 import { customStyles } from "../../modalSettings";
 import { denunceTextModal } from "../../modalSettings";
