@@ -30,12 +30,10 @@ import { useEffect } from 'react';
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
 export default function App() {
-
   // Front end
 
   const [messagePage, setMessagePage] = useState(false); // Controls the right column -> Talk page
   const [leftmenu, setLeftMenu] = useState(null);        // Controls the state of left menus
-
 
   const [friendIndex, setFriendIndex] = useState('');     // Send index of friend in db to talk page
 
@@ -52,8 +50,6 @@ export default function App() {
   const [dropdown, setDropdown] = useState(null);
   
   const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
-  
-  let numSaved = 0;
 
   function changePage(email, idx) { // Search for better way to do this...
     
@@ -75,8 +71,15 @@ export default function App() {
     card.className = "card-active"; // The select card will have this className
   }
 
-  function addConversation(idx) {
-    // TODO: 
+  function addConversation(email) {
+    const newChatId = currentUser.email > email 
+      ? currentUser.email + email
+      : email + currentUser.email
+
+    setFriendIndex(email);
+    setMessagePage(true);
+    setChatId(newChatId)
+    setLeftMenu(false)
   }
 
   function previewImage(file) { // handleUpload()
@@ -141,34 +144,39 @@ export default function App() {
   const [email, setEmail] = useState('')
 
   const userRef = doc(db, 'users', currentUser.email);
-  //const messagesRef = collection(db, "messages")
+  //const chatRef = collection(db, "chat")
   const contactsRef = collection(db, "users")
 
   useEffect(() => {
     onSnapshot(userRef, (snapshot) => {
       setUser(snapshot.data());
-    })
 
-    const allUsers = query(contactsRef, where('id', '!=', currentUser.email))
-
-    onSnapshot(allUsers, (snapshot) => {
-      setContacts(snapshot.docs.map((contact) => ({...contact.data()})));
-    })
-
+      setContacts([])
+      let contactsList = snapshot.data().contacts ?? snapshot.data().contacts
+      let contactsArray = []
+      for (let i = 0; i < contactsList.length; i++) { // Picking all users inside current user contact list
+        const q = query(contactsRef, where('email', '==', contactsList[i]))
+        onSnapshot(q, (snapshot) => {
+          contactsArray.push(snapshot.docs.map((contact) => ({...contact.data()})))
+          setContacts(contactsArray.map((contact) => contact[0]))
+        })
+      }
+    })   
   }, [])
 
-  async function addContact (email) {
-    const mycontactRef = doc(db, "users", currentUser.email, 'contacts', email);
-    const friendRef = doc(db, 'users', email);
-    setError('')
+  let numSaved = 0;
+  let user_image = user.photoUrl ? user.photoUrl : 'noImage.png'
 
+  async function addContact (email) {
+    setError('')
     if (!(currentUser.email === email)) {
       try {
-        const friendData = await getDoc(friendRef)
-        //setFriendInfo(friendData.data())
-  
-        setDoc(mycontactRef, { 
-          ...friendData.data() // Puttung all this data inside a new contact
+
+        updateDoc(userRef, {
+          "contacts": [
+            ...user.contacts,
+            email
+          ],
         })
   
       } catch (error) {
@@ -204,7 +212,7 @@ export default function App() {
 
         <div className="left-up">
           <button onClick={() => setLeftMenu('perfilMenu')}>
-            <img src={user.photoUrl} alt='' className="user-img"></img>
+            <img src={user_image} alt='' className="user-img"></img>
           </button>
           <div className='up-icon-holder'>
             <button>
@@ -242,16 +250,18 @@ export default function App() {
           </div>
           
           <div className="content-holder">
-            { filter ? //TODO: Check if the user have contact, if dont display some message with button
+            { filter ? //TODO: Check if the user have contact, if dont, display some message with button
                 <>
                   {
-                    contacts.map((contact, idx) => {
-                      return (
-                        <Card title={contact.name} content={contact.last_message} id={idx}
-                          date="Ontem" image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} key={idx} name={"recentTalks"}
-                          order={() => changePage(contact.email, idx)}
-                        />
-                      )
+                    contacts.map((contact, idx) => { // Next: Solve this error
+                      try {
+                        return (
+                          <Card title={contact.name} content={user.last_message[contact.email][0]} id={idx}
+                            date={user.last_message[contact.email][1]} image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} key={idx} name={"recentTalks"}
+                            order={() => changePage(contact.email, idx)}
+                          />
+                        )
+                      } catch (error) {}
                     })
                   }
                 </>
@@ -275,7 +285,7 @@ export default function App() {
 
         <LeftSideMenu id={'perfilMenu'} title={'Perfil'} toggler={leftmenu} closeFunction={() => setLeftMenu()}>
           <div id="inputImg-holder"> 
-            <img id="preview" src={user.photoUrl} alt=""></img>
+            <img id="preview" src={user_image} alt=""></img>
             <input
               type="file"
               onChange={(e) => previewImage(e.target.files[0])}
@@ -383,17 +393,16 @@ export default function App() {
                     <DividerLetter letter={letter} key={idx}/>
                     {
                       contacts.map((contact, idx) => {
-                        return (
-                          <>
-                            {
-                              contact.name[0] === letter &&
-                              <Card title={contact.name} content={contact.status} id={"n"+idx}
-                                image="cute-cat.jpg" key={idx} 
-                                order={() => addConversation(idx)}
-                              />
-                            }
-                          </>
-                        )
+                        if (contact.name[0] === letter) {
+                          return (
+                            <Card title={contact.name} content={contact.status} 
+                              id={"n"+idx}
+                              image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
+                              key={idx} 
+                              order={() => addConversation(contact.email)}
+                            />
+                          )
+                        }
                       })
                     }
                   </>
@@ -461,7 +470,7 @@ export default function App() {
 
         <LeftSideMenu id={'config'} title={'Configurações'} toggler={leftmenu} closeFunction={() => setLeftMenu()}>
           <button className='perfilButton' onClick={() => setLeftMenu('perfilMenu')}>
-            <img src={user.photoUrl} alt=''></img>
+            <img src={user_image} alt=''></img>
             <div className='texts'>
               <h3>{user.name}</h3>
               <span>{user.status}</span>

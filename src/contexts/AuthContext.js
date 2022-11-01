@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
     async function signup(email, password) {
         return auth.createUserWithEmailAndPassword(email, password).then(() => {
             setDoc(doc(firedb, 'users', email), {
-                id: email,
+                id: Math.ceil(Math.random()*Date.now()), // Unique ID
                 name: "DefaultName",
                 status: "Change your status here!",
                 online: false,

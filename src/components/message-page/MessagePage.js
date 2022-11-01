@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { customStyles } from "../../modalSettings";
 import { denunceTextModal } from "../../modalSettings";
-import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc, limit, getDoc } from "firebase/firestore";
 
 import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
@@ -39,29 +39,74 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     const [modalDeleteConversation, setModalDeleteConversation] = useState(false); // Modal for delete all messages
 
     const { currentUser } = useAuth()
-    
+  
     const [contact, setContact] = useState('')
     const [messages, setMessages] = useState([])
-
-    const contactRef = doc(db, "users", id)
-    const messagesRef = collection(db, "chat", chatId, 'messages')
+    const [messageDate, setMessageDate] = useState([])
 
     useEffect(() => {
+        const keyDownHandler = event => {     
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              document.getElementById('sendMessageButton').click()
+            }
+          };
+      
+          document.addEventListener('keydown', keyDownHandler);
+      
+          return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+          };
+    }, [])
+
+    useEffect(() => {
+        const userRef = doc(db, 'users', currentUser.email);
+        const contactRef = doc(db, "users", id)
+        const messagesRef = collection(db, "chat", chatId, 'messages')
+
+        async function updateLastMessageIn(doc, email, lastMessage) {
+            const ref = await getDoc(doc)
+            const data = ref.data()
+
+            await updateDoc(doc, {
+                "last_message": {
+                    ...data.last_message,
+                    [email]: [lastMessage[0].content, lastMessage[0].cardDate]
+                }
+            })
+        }
+
         onSnapshot(contactRef, orderBy('time', 'desc'), (snapshot) => {
           setContact(snapshot.data());
         })
 
-        const q = query(messagesRef, orderBy('date', 'asc'))
+        const allMessages = query(messagesRef, orderBy('date', 'asc'))
 
-        onSnapshot(q, (snapshot) => { // To implement delete message just for current user try to use where(cleared = true) in query
+        onSnapshot(allMessages, (snapshot) => { // To implement delete message just for current user try to use where(cleared = true) in query
             setMessages(snapshot.docs.map((message) => (message.data())));
+
+            let AllMessages = snapshot.docs.map((message) => (message.data()))
+            let MessageDate = []
+            let prevDate = ''
+            for (let i = 0; i < AllMessages.length; i++) {
+                if (AllMessages[i].cardDate !== prevDate) {
+                    MessageDate.push(AllMessages[i].cardDate)
+                    prevDate = AllMessages[i].cardDate
+                } else {}
+            }
+            setMessageDate(MessageDate)
         })
 
-        // onSnapshot(messagesRef, (snapshot) => {
-        //     setMessages(snapshot.docs.map((message) => ({...message.data()})));
-        // })
-    
-      }, [id])
+        const lastMessage = query(messagesRef, orderBy('date', 'desc'), limit(1))
+
+        onSnapshot(lastMessage, (snapshot) => {
+            try {
+                let lastMessage = snapshot.docs.map((lastmessage) => (lastmessage.data()))
+                updateLastMessageIn(contactRef, currentUser.email, lastMessage)
+                updateLastMessageIn(userRef, id, lastMessage)
+            } catch (error) {console.log(error);}
+        })
+    }, [id])
 
     // Default image for all users
     const user_image = contact.photoUrl ? contact.photoUrl : "noImage.png";
@@ -69,14 +114,16 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     function sendMessage( chatId ) { // Send message to your friend
         const dateC = new Date();
 
-        const minutes = ("0" + dateC.getMinutes()).slice(-2)
+        const seconds = ("0" + dateC.getSeconds()).slice(-2)
+        const minutes = ("0" + dateC.getMinutes()).slice(-2) + ":"
         const hours = ("0" + dateC.getHours()).slice(-2) + ":"
         const day = ("0" + dateC.getDate()).slice(-2) + "/"
-        const month = ("0" + dateC.getMonth()).slice(-2) + "/"
+        const month = ("0" + (dateC.getMonth() + 1)).slice(-2) + "/"
         const year = dateC.getFullYear() + "/"
 
-        const time = hours + minutes
-        const date = year + month + day + hours + minutes
+        const time = (hours + minutes).slice(0, -1)
+        const date = (day + month + year).slice(0, -1)
+        const long_date = year + month + day + hours + minutes + seconds
 
         const chatMessages = collection(db, "chat", chatId, 'messages')
 
@@ -86,15 +133,12 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             addDoc(chatMessages, { // Message sent to chatId room
                 "content": searchbar.value,
                 "time": time,
-                //"id": this.id,
-                "date": date,
+                //"id": this.id, ADD UNIQUE ID for each message, because we have this for delete it
+                "date": long_date,
+                "cardDate": date,
                 "read": true, // Default value for now
                 "autor": currentUser.email,
                 "for": id,
-            })
-
-            updateDoc(contactRef, {
-                "last_message": searchbar.value
             })
 
             searchbar.value = "";
@@ -102,21 +146,13 @@ export default function MessagePage({ id, chatId, closeFunction }) {
         }
     }
 
-    function inputControler( chatId ) {
-    let seachbar = document.getElementById("bottom-messageBar");
-    let searchbarLength = seachbar.value.length;
+    function inputControler() {
+        let seachbar = document.getElementById("bottom-messageBar");
+        let searchbarLength = seachbar.value.length;
 
-    if (searchbarLength > 0) {
-        seachbar.addEventListener("keydown", (e) => {
-            if (e.key === 'Enter') {
-                sendMessage( chatId );
-            }
-        });
+        setSearchBarLength(searchbarLength);
     }
-
-    setSearchBarLength(searchbarLength);
-    }
-
+    
     return(
         <div className="message-page">
             <div className="message-content-holder">
@@ -158,33 +194,52 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 </section>
 
                 <section id="chatbox">
-                    <MessageDate date={'today'}/>
                     {
-                        messages.map((message, idx) => {
-                            const dropdownId = 'mdd'+idx;
+                        messageDate.map((date) => {
                             return (
-                                <MessageCard id={idx} content={message.content} 
-                                    time={message.time} isRead={message.read} 
-                                    key={idx} isMy={message.autor === currentUser.email}
-                                >
-                                    <button className='message-card-dropbutton' onClick={() => setDropdown(dropdownId)} 
-                                        style={ dropdown === dropdownId ? {display: "flex", opacity: '1'} : {}}
-                                    >
-                                    <IoIosArrowDown className='downArrow'/>
-                                    </button>
-                                    <DropMenu classname={'message-card-dropdown'} toggler={dropdown} 
-                                        order={() => setDropdown()} id={dropdownId}
-                                    >
-                                        <button>Responder</button>
-                                        <button>Reagir à mensagem</button>
-                                        <button>Encaminhar mensagem</button>
-                                        <button>Favoritar mensagem</button>
-                                        <button>Denunciar</button>
-                                        <button onClick={() => {setModalDelete(true); setDropdown(null)}}>Apagar mensagem</button>
-                                    </DropMenu>
-                                </MessageCard>
+                                <>
+                                    <MessageDate date={date}/>
+                                    {
+                                        messages.map((message, idx) => {
+                                            const dropdownId = 'mdd'+idx;
+                                            if (message.cardDate == date) {
+                                                return (
+                                                    <MessageCard id={idx} content={message.content} 
+                                                        time={message.time} isRead={message.read} 
+                                                        key={idx} isMy={message.autor === currentUser.email}
+                                                    >
+                                                        <button className='message-card-dropbutton' onClick={() => setDropdown(dropdownId)} 
+                                                            style={ dropdown === dropdownId ? {display: "flex", opacity: '1'} : {}}
+                                                        >
+                                                        <IoIosArrowDown className='downArrow'/>
+                                                        </button>
+                                                        <DropMenu classname={'message-card-dropdown'} toggler={dropdown} 
+                                                            order={() => setDropdown()} id={dropdownId}
+                                                        >
+                                                            <button>Responder</button>
+                                                            <button>Reagir à mensagem</button>
+                                                            <button>Encaminhar mensagem</button>
+                                                            <button>Favoritar mensagem</button>
+                                                            <button>Denunciar</button>
+                                                            <button 
+                                                                onClick={() => {setModalDelete(true); setDropdown(null)}}
+                                                            >
+                                                                Apagar mensagem
+                                                            </button>
+                                                        </DropMenu>
+                                                    </MessageCard>
+                                                )
+                                            }
+                                        })
+                                    }
+                                
+                                </>
                             )
                         })
+                    }
+                    
+                    {
+                        
                     }
                 </section>
                 
@@ -233,15 +288,16 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                     </div>
 
                     <div className="bottom-messageBar-holder">
-                        <input id="bottom-messageBar" placeholder="Digite uma mensagem..." 
-                            onChange={() => inputControler(chatId)}
+                        <input id="bottom-messageBar" placeholder="Digite uma mensagem..."
+                          onChange={() => inputControler()}
                         >  
                         </input>
                     </div>
 
                     <div className="bottom-end">
-                        <button style={{marginRight: '10px'}}
-                            onClick={() => sendMessage(chatId)}
+                        <button id='sendMessageButton' 
+                         style={{marginRight: '10px'}}
+                         onClick={() => sendMessage(chatId)}
                         >
                             {
                                 searchbarlength > 0 ?
