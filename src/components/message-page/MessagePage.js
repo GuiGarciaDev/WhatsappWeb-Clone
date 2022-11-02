@@ -1,10 +1,10 @@
 import "../message-page/style.scss";
 import { firedb as db } from "../../firebase";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { customStyles } from "../../modalSettings";
 import { denunceTextModal } from "../../modalSettings";
-import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc, limit, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc, limit, getDoc, deleteDoc, where } from "firebase/firestore";
 
 import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
@@ -21,6 +21,7 @@ import { RiStickyNoteFill } from 'react-icons/ri';
 import { FaArrowRight, FaMicrophone } from 'react-icons/fa';
 import TwoOptionsModal from "../2opt-modal/TwoOptionsModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { getDate, getFullDate, getTime } from "../../date";
 
 export default function MessagePage({ id, chatId, closeFunction }) { 
     const [rightmenu, setRightMenu] = useState(null);
@@ -43,6 +44,8 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     const [contact, setContact] = useState('')
     const [messages, setMessages] = useState([])
     const [messageDate, setMessageDate] = useState([])
+
+    const [deletedMessageId, setDeletedMessageId] = useState();
 
     useEffect(() => {
         const keyDownHandler = event => {     
@@ -68,18 +71,22 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             const ref = await getDoc(doc)
             const data = ref.data()
 
-            await updateDoc(doc, {
-                "last_message": {
-                    ...data.last_message,
-                    [email]: [lastMessage[0].content, lastMessage[0].cardDate]
-                }
-            })
+            try {
+                await updateDoc(doc, {
+                    "last_message": {
+                        ...data.last_message,
+                        [email]: [lastMessage[0].content, lastMessage[0].cardDate]
+                    }
+                })
+            } catch (error) {}
         }
 
         onSnapshot(contactRef, orderBy('time', 'desc'), (snapshot) => {
           setContact(snapshot.data());
         })
 
+        //const allMessagesFiltered = query(messagesRef, where('cleared', '==', ''))
+        //const allMessages = query(allMessagesFiltered, orderBy('date', 'asc'))
         const allMessages = query(messagesRef, orderBy('date', 'asc'))
 
         onSnapshot(allMessages, (snapshot) => { // To implement delete message just for current user try to use where(cleared = true) in query
@@ -112,19 +119,6 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     const user_image = contact.photoUrl ? contact.photoUrl : "noImage.png";
 
     function sendMessage( chatId ) { // Send message to your friend
-        const dateC = new Date();
-
-        const seconds = ("0" + dateC.getSeconds()).slice(-2)
-        const minutes = ("0" + dateC.getMinutes()).slice(-2) + ":"
-        const hours = ("0" + dateC.getHours()).slice(-2) + ":"
-        const day = ("0" + dateC.getDate()).slice(-2) + "/"
-        const month = ("0" + (dateC.getMonth() + 1)).slice(-2) + "/"
-        const year = dateC.getFullYear() + "/"
-
-        const time = (hours + minutes).slice(0, -1)
-        const date = (day + month + year).slice(0, -1)
-        const long_date = year + month + day + hours + minutes + seconds
-
         const chatMessages = collection(db, "chat", chatId, 'messages')
 
         const searchbar = document.getElementById("bottom-messageBar")
@@ -132,18 +126,38 @@ export default function MessagePage({ id, chatId, closeFunction }) {
         if (searchbar.value.length > 0) {
             addDoc(chatMessages, { // Message sent to chatId room
                 "content": searchbar.value,
-                "time": time,
-                //"id": this.id, ADD UNIQUE ID for each message, because we have this for delete it
-                "date": long_date,
-                "cardDate": date,
+                "time": getTime(),
+                "date": getFullDate(),
+                "cardDate": getDate(),
                 "read": true, // Default value for now
                 "autor": currentUser.email,
                 "for": id,
+                "cleared": '',
+            }).then(function (docRef) {
+                updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
+                    "id": docRef.id
+                })
             })
 
             searchbar.value = "";
             setSearchBarLength(0);
         }
+    }
+
+    function deleteMessage ( messageId ) {
+        // const messageRef = doc(db, "chat", chatId, 'messages', messageId)
+
+        // deleteDoc(messageRef)
+        setModalDelete(false)
+    }
+
+    function clearMessage ( messageId ) {
+        // const messageRef = doc(db, "chat", chatId, 'messages', messageId)
+
+        // updateDoc(messageRef, {
+        //     ['clearedFor'+currentUser.email]: currentUser.email
+        // })
+        setModalDelete(false)
     }
 
     function inputControler() {
@@ -202,7 +216,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                     {
                                         messages.map((message, idx) => {
                                             const dropdownId = 'mdd'+idx;
-                                            if (message.cardDate == date) {
+                                            if (message.cardDate === date) {
                                                 return (
                                                     <MessageCard id={idx} content={message.content} 
                                                         time={message.time} isRead={message.read} 
@@ -222,7 +236,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                                             <button>Favoritar mensagem</button>
                                                             <button>Denunciar</button>
                                                             <button 
-                                                                onClick={() => {setModalDelete(true); setDropdown(null)}}
+                                                                onClick={() => {setModalDelete(true); setDropdown(null); setDeletedMessageId(message.id)}}
                                                             >
                                                                 Apagar mensagem
                                                             </button>
@@ -381,8 +395,8 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 <div className="deleteModal-content">
                     <span>Deseja apagar a mensagem?</span>
                     <div className="button-holder">
-                        <button>APAGAR PARA TODOS</button>
-                        <button>APAGAR PARA MIM</button>
+                        <button onClick={() => deleteMessage(deletedMessageId)}>APAGAR PARA TODOS</button>
+                        <button onClick={() => clearMessage(deletedMessageId)}>APAGAR PARA MIM</button>
                         <button onClick={() => setModalDelete(false)}>CANCELAR</button>
                     </div>
                 </div>

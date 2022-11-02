@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { firedb as db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { collection, doc, getDoc, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { collection, doc, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
 
 import { AiOutlineUserAdd, AiFillBell, AiOutlineCheck } from 'react-icons/ai';
 import { BiShieldQuarter } from 'react-icons/bi';
@@ -25,6 +25,7 @@ import { MdGroup, MdLock, MdBrightnessMedium, MdModeEdit } from 'react-icons/md'
 import { RiImageEditFill } from 'react-icons/ri'; 
 import { VscSymbolKey } from 'react-icons/vsc'; 
 import { useEffect } from 'react';
+import { getFullDateWithSpace } from '../date';
 
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
@@ -164,7 +165,7 @@ export default function App() {
     })   
   }, [])
 
-  let numSaved = 0;
+  let numSaved = contacts.length;
   let user_image = user.photoUrl ? user.photoUrl : 'noImage.png'
 
   async function addContact (email) {
@@ -200,6 +201,9 @@ export default function App() {
 
     try {
       await logout()
+      updateDoc(userRef, {
+        "last_connection": getFullDateWithSpace()
+      })
       navigate('/login')
     } catch {
       setError('Failed to log out')
@@ -380,7 +384,7 @@ export default function App() {
 
             <div className='nMessage-cards-map'>
               {
-                numSaved === 1 ? 
+                numSaved === 0 ? 
                   <span>
                     Você ainda não tem contatos, tente 
                     <a href='https://github.com/Guilherme-ds-Garcia'> adicionar </a> 
