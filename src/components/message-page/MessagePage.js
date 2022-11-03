@@ -90,15 +90,21 @@ export default function MessagePage({ id, chatId, closeFunction }) {
         const allMessages = query(messagesRef, orderBy('date', 'asc'))
 
         onSnapshot(allMessages, (snapshot) => { // To implement delete message just for current user try to use where(cleared = true) in query
-            setMessages(snapshot.docs.map((message) => (message.data())));
+            let AllMessages = []
+            snapshot.docs.map((message) => {
+                if (message.data().clearedFor[currentUser.email] !== true) {
+                    AllMessages.push(message.data())
+                } 
+            })
+            setMessages(AllMessages);
 
-            let AllMessages = snapshot.docs.map((message) => (message.data()))
+            //let AllMessages = snapshot.docs.map((message) => (message.data()))
             let MessageDate = []
             let prevDate = ''
             for (let i = 0; i < AllMessages.length; i++) {
                 if (AllMessages[i].cardDate !== prevDate) {
                     MessageDate.push(AllMessages[i].cardDate)
-                    prevDate = AllMessages[i].cardDate
+                    prevDate = AllMessages[i].cardDate                
                 } else {}
             }
             setMessageDate(MessageDate)
@@ -132,7 +138,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 "read": true, // Default value for now
                 "autor": currentUser.email,
                 "for": id,
-                "cleared": '',
+                "clearedFor": {},
             }).then(function (docRef) {
                 updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
                     "id": docRef.id
@@ -145,19 +151,25 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     }
 
     function deleteMessage ( messageId ) {
-        // const messageRef = doc(db, "chat", chatId, 'messages', messageId)
-
-        // deleteDoc(messageRef)
+        const messageRef = doc(db, "chat", chatId, 'messages', messageId)
+       
+        deleteDoc(messageRef)
         setModalDelete(false)
+        setDropdown(null)
     }
 
-    function clearMessage ( messageId ) {
-        // const messageRef = doc(db, "chat", chatId, 'messages', messageId)
+    async function clearMessage ( messageId ) {
+        const messageRef = doc(db, "chat", chatId, 'messages', messageId)
+        const prevInfo = await getDoc(messageRef)
 
-        // updateDoc(messageRef, {
-        //     ['clearedFor'+currentUser.email]: currentUser.email
-        // })
+        updateDoc(messageRef, {
+            "clearedFor": {
+                ...prevInfo.data().clearedFor,
+                [currentUser.email]: true
+            }
+        })
         setModalDelete(false)
+        setDropdown(null)
     }
 
     function inputControler() {
@@ -236,7 +248,12 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                                             <button>Favoritar mensagem</button>
                                                             <button>Denunciar</button>
                                                             <button 
-                                                                onClick={() => {setModalDelete(true); setDropdown(null); setDeletedMessageId(message.id)}}
+                                                                onClick={() => {
+                                                                   if (message.autor === currentUser.email) {
+                                                                    setModalDelete(true)
+                                                                    setDeletedMessageId(message.id)
+                                                                   } else {clearMessage(message.id)}
+                                                                }}
                                                             >
                                                                 Apagar mensagem
                                                             </button>
