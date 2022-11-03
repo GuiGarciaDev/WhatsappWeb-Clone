@@ -31,6 +31,7 @@ export default function NewContactModal({ state, closeFunction, children}) {
             contentLabel="Example Modal"
             shouldCloseOnOverlayClick={false}
             id="newContactModal"
+            appElement={document.getElementById('root')}
         >
             <div className="deleteModalConversation-content">
                 <h2>Adicionar contato</h2>

@@ -241,6 +241,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                                         </button>
                                                         <DropMenu classname={'message-card-dropdown'} toggler={dropdown} 
                                                             order={() => setDropdown()} id={dropdownId}
+                                                            isMy={message.autor === currentUser.email}
                                                         >
                                                             <button>Responder</button>
                                                             <button>Reagir à mensagem</button>
@@ -408,6 +409,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 contentLabel="Example Modal"
                 shouldCloseOnOverlayClick={false}
                 id="deleteModal"
+                appElement={document.getElementById('root')}
             >
                 <div className="deleteModal-content">
                     <span>Deseja apagar a mensagem?</span>

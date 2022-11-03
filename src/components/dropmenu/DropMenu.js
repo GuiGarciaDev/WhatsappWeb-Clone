@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-export default function DropMenu({classname, children, toggler, order, id}) {
+export default function DropMenu({classname, children, toggler, order, id, isMy}) {
     const wrapperRef = useRef(null);
 
     useEffect(() => {
@@ -21,10 +21,22 @@ export default function DropMenu({classname, children, toggler, order, id}) {
         document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [wrapperRef, order]);
+
+    let styles = {}
+
+    if (toggler === id) {
+        if (!isMy) {
+            styles = {display: 'flex', left: '60px'}
+        } else {
+            styles = {display: 'flex', right: '20px'}
+        }
+    } else {
+        styles = {display: 'none'}
+    }
       
 
     return (
-        <div className={classname} ref={wrapperRef} id={id} style={toggler === id ? {display: 'flex'} : {display: 'none'}}>
+        <div className={classname} ref={wrapperRef} id={id} style={styles}>
             {children}
         </div>
     )

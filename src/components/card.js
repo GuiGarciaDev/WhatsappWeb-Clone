@@ -1,12 +1,8 @@
 import "./style.scss";
 
-export default function Card({title, content, date, id, image, order, name }) {
-    if (image === "Default") {
-        image = "noImage.png";
-    }
-
+export default function Card({title, content, date, id, image, order, active }) {
     return(
-        <button id={id} className="card" onClick={order} name={name}>
+        <button id={id} className={active === id ? 'card-active' : 'card'} onClick={order}>
             <img src={image} alt='' ></img>
             <div className="border-holder">
                 <div className="mid">

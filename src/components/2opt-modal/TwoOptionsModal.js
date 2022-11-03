@@ -16,6 +16,7 @@ export default function TwoOptionsModal(props) {
             contentLabel="Example Modal"
             shouldCloseOnOverlayClick={false}
             id="twoOptionModal"
+            appElement={document.getElementById('root')}
         >
             <div className="deleteModalConversation-content">
                 <h2>{props.title}</h2>

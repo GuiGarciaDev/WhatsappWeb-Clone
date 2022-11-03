@@ -39,6 +39,7 @@ export default function App() {
   const [friendIndex, setFriendIndex] = useState('');     // Send index of friend in db to talk page
 
   const [editName, setEditName] = useState(false);
+  const [cardActived, setCardActived] = useState('');
   const [editEmail, setEditEmail] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [filter, setFilter] = useState(true);
@@ -58,18 +59,10 @@ export default function App() {
       ? currentUser.email + email
       : email + currentUser.email
 
-    setFriendIndex(email);
-    setMessagePage(true);
+    setFriendIndex(email)
+    setMessagePage(true)
     setChatId(newChatId)
-    
-    const otherCards = document.getElementsByName("recentTalks"); // Picking all recent cards
-
-    for (let i = 0; i < contacts.length; i++) { // Restarting all cards ClassNames for "card"
-      otherCards[i].className = "card";
-    }
-
-    const card = document.getElementById(idx); // Picking all recent cards of new talk
-    card.className = "card-active"; // The select card will have this className
+    setCardActived(idx)
   }
 
   function addConversation(email) {
@@ -261,7 +254,8 @@ export default function App() {
                       try {
                         return (
                           <Card title={contact.name} content={user.last_message[contact.email][0]} id={idx}
-                            date={user.last_message[contact.email][1]} image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} key={idx} name={"recentTalks"}
+                            date={user.last_message[contact.email][1]} image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
+                            key={idx} active={cardActived}
                             order={() => changePage(contact.email, idx)}
                           />
                         )

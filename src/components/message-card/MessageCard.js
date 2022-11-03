@@ -14,9 +14,13 @@ export default function MessageCard({ id, content, time, isRead, children, isMy 
 
     return (
         <>
-            <div id={id} className="message-card" style={isMy ? {alignSelf: 'flex-end'} : {alignSelf: 'flex-start'}} ref={lastMessageRef}>
+            <div id={id} className="message-card" 
+            style={isMy ? {alignSelf: 'flex-end', borderRadius: '10px 0 10px 10px'} : {alignSelf: 'flex-start', borderRadius: '0 10px 10px 10px'}} 
+            ref={lastMessageRef}
+            >
                 <div className='message-card-content'>
                     <p>{content}</p>
+                    <label style={isMy ? {right: '-12px'} : {left: '-12px', transform: 'scale(-1, 1)'}}/>
                 </div>
                 <div className='time'>
                     <span id='message-card-time'>{time}</span>
