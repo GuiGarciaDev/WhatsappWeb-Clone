@@ -3,12 +3,13 @@
     position: absolute;
     flex-direction: column;
     overflow-y: scroll;
+    overflow-x: hidden;
     max-height: 100vh;
     $height: 100vh;
     right: 0;
     background-color: var(--background-left);
     font-size: 14px;
-    transition: .7s ease; 
+    transition: .35s ease; 
     z-index: 10;
 
     #header {
@@ -55,24 +56,36 @@
 @media (min-width: 881px) {
   .sidebarRight {
       width: 400px;
+      .sidebarRight-Content, #header {
+        min-width: 390px;
+      }
   }
 }
 
 @media (max-width: 880px) {
   .sidebarRight {
       width: 350px;
+      .sidebarRight-Content, #header {
+        min-width: 340px;
+      }
   }
 }
 
 @media (max-width: 800px) {
   .sidebarRight {
       width: 300px;
+      .sidebarRight-Content, #header {
+        min-width: 290px;
+      }
   }
 }
 
 @media (max-width: 750px) {
   .sidebarRight {
       width: 250px;
+      .sidebarRight-Content, #header {
+        min-width: 240px;
+      }
   }
 }
 

@@ -50,6 +50,48 @@
                 overflow: hidden;
             }
         }
+
+        @media (max-width: 880px) {
+            .mid {
+              max-width: 180px;
+            }
+          }
+    
+          @media (max-width: 800px) {
+            .mid {
+              max-width: 130px;
+            }
+          }
+    
+          @media (max-width: 750px) {
+            .mid {
+              max-width: 80px;
+            }
+          }
+    
+          @media (max-width: 630px) {
+            .mid {
+              max-width: 300px;
+            }
+          }
+
+          @media (max-width: 500px) {
+            .mid {
+              max-width: 200px;
+            }
+          }
+
+          @media (max-width: 500px) {
+            .mid {
+              max-width: 150px;
+            }
+          }
+
+          @media (max-width: 330px) {
+            .mid {
+              max-width: 100px;
+            }
+          }
     
         .end {
             display: flex;
