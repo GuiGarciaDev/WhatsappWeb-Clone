@@ -1,0 +1,8 @@
+#search-result {
+    display: flex;
+    overflow-y: auto !important;
+    flex-direction: column;
+    background-color: var(--background-left);
+    transition: .5s ease;
+    overflow: hidden;
+}

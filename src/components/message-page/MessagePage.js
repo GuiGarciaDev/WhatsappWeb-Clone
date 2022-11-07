@@ -321,7 +321,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
 
                     <div className="bottom-messageBar-holder">
                         <input id="bottom-messageBar" placeholder="Digite uma mensagem..."
-                          onChange={() => inputControler()}
+                          onChange={() => inputControler()} autoComplete='off'
                         >  
                         </input>
                     </div>

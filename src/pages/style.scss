@@ -115,6 +115,7 @@
     .left-sub {
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
       height: 100%;
 
       .searchbar-filter {
@@ -127,11 +128,10 @@
 
         .searchbar-holder {
           display: flex;
+          flex-direction: column;
           width: 85%;
-          height: 35px;
           margin: 7px 0;
-          border-radius: 10px;
-          background-color: var(--background-right);
+          background-color: transparent;
         }
 
         button {
@@ -144,6 +144,8 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          align-self: flex-start;
+          margin-top: 10px;
           border: 0;
           width: 28px;
           height: 28px;
@@ -343,7 +345,7 @@
       .nMessage-seachBar-holder {
         display: flex;
         justify-content: center;
-        margin: 10px 0;
+        margin: 10px 15px;
       }
 
       .nMessage-groupCard-holder {
@@ -435,7 +437,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 10px 0;
+      padding: 10px 15px;
     }
 
     .perfilButton { // Config SideMenu

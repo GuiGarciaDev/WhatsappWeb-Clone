@@ -1,0 +1,92 @@
+
+.search-card {
+    display: flex;
+    width: 100%;
+    min-width: 250px;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 5px;
+    border: 0;
+    transition: .2s ease;
+    background-color: var(--background-left);
+    cursor: pointer;
+
+    img {
+        height: 55px;
+        width: 55px;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+    .border-holder {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .mid {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 230px;
+            height: 70px;
+            text-align: start;
+
+            h1 {
+                color: var(--name);
+                font-size: 16px;
+                margin: 2px 0;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: 100%;
+                display: block;
+                overflow: hidden;
+            }
+        }
+
+        @media (max-width: 880px) {
+            .mid {
+              max-width: 180px;
+            }
+          }
+    
+          @media (max-width: 800px) {
+            .mid {
+              max-width: 130px;
+            }
+          }
+    
+          @media (max-width: 750px) {
+            .mid {
+              max-width: 80px;
+            }
+          }
+    
+          @media (max-width: 630px) {
+            .mid {
+              max-width: 300px;
+            }
+          }
+
+          @media (max-width: 500px) {
+            .mid {
+              max-width: 200px;
+            }
+          }
+
+          @media (max-width: 500px) {
+            .mid {
+              max-width: 150px;
+            }
+          }
+
+          @media (max-width: 330px) {
+            .mid {
+              max-width: 100px;
+            }
+          }
+    }
+}
+
+.search-card:hover {
+    background-color: var(--card-hover) !important;
+}

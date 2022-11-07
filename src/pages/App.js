@@ -27,7 +27,6 @@ import { VscSymbolKey } from 'react-icons/vsc';
 import { useEffect } from 'react';
 import { getFullDateWithSpace } from '../date';
 
-
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
 export default function App() {
@@ -142,9 +141,10 @@ export default function App() {
   const contactsRef = collection(db, "users")
 
   useEffect(() => {
+
     onSnapshot(userRef, (snapshot) => {
       setUser(snapshot.data());
-
+  
       setContacts([])
       let contactsList = snapshot.data().contacts ?? snapshot.data().contacts
       let contactsArray = []
@@ -239,6 +239,7 @@ export default function App() {
             <div className="searchbar-holder">
               <SearchBar placeholder={"Pesquisar ou começar uma nova conversa"}
                 arrowId="leftC-arrow" searchId="leftC-search"
+                order={changePage}
               />
             </div>
             <button id='filterButton' onClick={() => toggleFilter()}>
@@ -249,8 +250,8 @@ export default function App() {
           <div className="content-holder">
             { filter ? //TODO: Check if the user have contact, if dont, display some message with button
                 <>
-                  {
-                    contacts.map((contact, idx) => { // Next: Solve this error
+                  {                  
+                    contacts.map((contact, idx) => {
                       try {
                         return (
                           <Card title={contact.name} content={user.last_message[contact.email][0]} id={idx}
@@ -289,6 +290,7 @@ export default function App() {
               onChange={(e) => previewImage(e.target.files[0])}
               accept="/image/*"
               id="file"
+              autoComplete='off'
             />
             <label htmlFor="file"></label>
           </div>
@@ -512,7 +514,7 @@ export default function App() {
         closeFunction={() => setNewContactModal(false)} 
       >
         <div className='email-holder'>
-            <input placeholder='Friend Email' type='email' onChange={(e) => setEmail(e.target.value)}/>
+            <input placeholder='Friend Email' type='email' autoComplete='off' onChange={(e) => setEmail(e.target.value)}/>
         </div>
         <div className="button-holder">
             <button onClick={() => setNewContactModal(false)}>CANCELAR</button>
