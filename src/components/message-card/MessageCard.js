@@ -22,9 +22,11 @@ export default function MessageCard({ id, content, time, isRead, children, isMy 
                     <p>{content}</p>
                     <label style={isMy ? {right: '-12px'} : {left: '-12px', transform: 'scale(-1, 1)'}}/>
                 </div>
-                <div className='time'>
-                    <span id='message-card-time'>{time}</span>
-                    <BsCheckAll style={isRead ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/>
+                <div className='time' style={!isMy ? {right: '0px'} : {right: '-9px'}}>
+                    <span id='message-card-time' >{time}</span>
+                    {
+                        isMy ? <BsCheckAll style={isRead ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> : <></>
+                    }
                 </div>
                 
                 {children}

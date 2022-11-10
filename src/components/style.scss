@@ -93,16 +93,27 @@
             }
           }
     
-        .end {
-            display: flex;
-            color: var(--text-secondary);
-            justify-self: flex-end;
+      .end {
+          display: flex;
+          flex-direction: column;
+          color: var(--text-secondary);
+          justify-self: flex-end;
+          align-items: center;
 
-            span {
-                margin-top: 10px;
-                margin-right: 10px;
-                font-size: 13px;
-            }
+          span {
+              margin-top: 10px;
+              margin-right: 10px;
+              font-size: 13px;
+          }
+
+          .notReaded {
+            justify-content: center;
+            color: #111B21;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary-green);
+          }
         }
     }
 }

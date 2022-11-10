@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Modal from 'react-modal';
 import { customStyles } from "../../modalSettings";
 import { denunceTextModal } from "../../modalSettings";
-import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc, limit, getDoc, deleteDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc, limit, getDoc, deleteDoc, where, getDocs } from "firebase/firestore";
 
 import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
@@ -41,13 +41,17 @@ export default function MessagePage({ id, chatId, closeFunction }) {
 
     const { currentUser } = useAuth()
   
+    const [user, setUser] = useState();
     const [contact, setContact] = useState('')
     const [messages, setMessages] = useState([])
     const [messageDate, setMessageDate] = useState([])
 
     const [deletedMessageId, setDeletedMessageId] = useState();
+    const [messagesNotReaded, setMessagesNotReaded] = useState(0)
 
     useEffect(() => {
+        const userRef = doc(db, 'users', currentUser.email);
+
         const keyDownHandler = event => {     
             if (event.key === 'Enter') {
               event.preventDefault();
@@ -67,6 +71,21 @@ export default function MessagePage({ id, chatId, closeFunction }) {
         const contactRef = doc(db, "users", id)
         const messagesRef = collection(db, "chat", chatId, 'messages')
 
+        async function updateReadStatus() {
+            const friendMessagesRef = query(messagesRef, where('autor', '!=', currentUser.email), where('read', '==', false))
+            const friendMessages = await getDocs(friendMessagesRef)
+            friendMessages.forEach((message) => {
+                updateDoc(doc(db, "chat", chatId, 'messages', message.data().id), {
+                    'read': true
+                })
+            })
+            updateDoc(userRef, {
+                'messages_not_readed': {
+                    [id]: 0 
+                }
+            })
+        }
+
         async function updateLastMessageIn(doc, email, lastMessage) {
             const ref = await getDoc(doc)
             const data = ref.data()
@@ -75,7 +94,12 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 await updateDoc(doc, {
                     "last_message": {
                         ...data.last_message,
-                        [email]: [lastMessage[0].content, lastMessage[0].cardDate]
+                        [email]: [
+                            lastMessage[0].content, 
+                            lastMessage[0].cardDate, 
+                            lastMessage[0].read, 
+                            lastMessage[0].autor,
+                        ]
                     }
                 })
             } catch (error) {}
@@ -85,11 +109,9 @@ export default function MessagePage({ id, chatId, closeFunction }) {
           setContact(snapshot.data());
         })
 
-        //const allMessagesFiltered = query(messagesRef, where('cleared', '==', ''))
-        //const allMessages = query(allMessagesFiltered, orderBy('date', 'asc'))
         const allMessages = query(messagesRef, orderBy('date', 'asc'))
 
-        onSnapshot(allMessages, (snapshot) => { // To implement delete message just for current user try to use where(cleared = true) in query
+        onSnapshot(allMessages, (snapshot) => {
             let AllMessages = []
             snapshot.docs.map((message) => {
                 if (message.data().clearedFor[currentUser.email] !== true) {
@@ -108,6 +130,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 } else {}
             }
             setMessageDate(MessageDate)
+            updateReadStatus()
         })
 
         const lastMessage = query(messagesRef, orderBy('date', 'desc'), limit(1))
@@ -124,7 +147,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     // Default image for all users
     const user_image = contact.photoUrl ? contact.photoUrl : "noImage.png";
 
-    function sendMessage( chatId ) { // Send message to your friend
+    async function sendMessage( chatId ) { // Send message to your friend
         const chatMessages = collection(db, "chat", chatId, 'messages')
 
         const searchbar = document.getElementById("bottom-messageBar")
@@ -135,13 +158,18 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 "time": getTime(),
                 "date": getFullDate(),
                 "cardDate": getDate(),
-                "read": true, // Default value for now
+                "read": false,
                 "autor": currentUser.email,
                 "for": id,
                 "clearedFor": {},
             }).then(function (docRef) {
                 updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
                     "id": docRef.id
+                })
+                updateDoc(doc(db, 'users', id), {
+                    'messages_not_readed': {
+                        [currentUser.email]: (contact.messages_not_readed[currentUser.email] + 1)
+                    }
                 })
             })
 
@@ -239,7 +267,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                                         >
                                                         <IoIosArrowDown className='downArrow'/>
                                                         </button>
-                                                        <DropMenu classname={'message-card-dropdown'} toggler={dropdown} 
+                                                        <DropMenu classname={'message-card-dropdown'} toggler={dropdown}
                                                             order={() => setDropdown()} id={dropdownId}
                                                             isMy={message.autor === currentUser.email}
                                                         >

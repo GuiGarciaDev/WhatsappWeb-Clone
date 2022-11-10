@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { firedb as db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { collection, doc, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getDocsFromCache, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
 
 import { AiOutlineUserAdd, AiFillBell, AiOutlineCheck } from 'react-icons/ai';
 import { BiShieldQuarter } from 'react-icons/bi';
@@ -142,21 +142,30 @@ export default function App() {
 
   useEffect(() => {
 
+    async function putContact(contacts) {
+      setContacts([])
+      let contactsArray = []
+      for (let i = 0; i < contacts.length; i++) { // Picking all users inside current user contact list
+        const q = query(contactsRef, where('email', '==', contacts[i]))
+        const data = await getDocs(q)
+        data.forEach((contact) => {
+          contactsArray.push(contact.data())
+          setContacts(contactsArray.map((contact) => contact))
+        })
+        // onSnapshot(q, (snapshot) => {
+        //   contactsArray.push(snapshot.docs.map((contact) => ({...contact.data()})))
+        //   setContacts(contactsArray.map((contact) => contact[0]))
+        // })
+      }
+    }
     onSnapshot(userRef, (snapshot) => {
       setUser(snapshot.data());
-  
-      setContacts([])
+
       let contactsList = snapshot.data().contacts ?? snapshot.data().contacts
-      let contactsArray = []
-      for (let i = 0; i < contactsList.length; i++) { // Picking all users inside current user contact list
-        const q = query(contactsRef, where('email', '==', contactsList[i]))
-        onSnapshot(q, (snapshot) => {
-          contactsArray.push(snapshot.docs.map((contact) => ({...contact.data()})))
-          setContacts(contactsArray.map((contact) => contact[0]))
-        })
-      }
+      putContact(contactsList)
     })   
   }, [])
+
 
   let numSaved = contacts.length;
   let user_image = user.photoUrl ? user.photoUrl : 'noImage.png'
@@ -256,8 +265,10 @@ export default function App() {
                         return (
                           <Card title={contact.name} content={user.last_message[contact.email][0]} id={idx}
                             date={user.last_message[contact.email][1]} image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
-                            key={idx} active={cardActived}
+                            key={idx} active={cardActived} read={user.last_message[contact.email][2]}
                             order={() => changePage(contact.email, idx)}
+                            isMy={!(user.last_message[contact.email][3] === contact.email)}
+                            notReaded={user.messages_not_readed[contact.email]}
                           />
                         )
                       } catch (error) {}
