@@ -34,7 +34,6 @@ export default function DropMenu({classname, children, toggler, order, id, isMy}
         styles = {display: 'none'}
     }
       
-
     return (
         <div className={classname} ref={wrapperRef} id={id} style={styles}>
             {children}
