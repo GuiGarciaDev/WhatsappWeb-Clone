@@ -1,0 +1,19 @@
+.pdf {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 300px;
+
+    .title-holder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--text-primary);              
+
+        span {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+    }
+}

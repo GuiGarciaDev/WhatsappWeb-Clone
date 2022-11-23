@@ -18,12 +18,13 @@
   --group-img-background: #00a884;
   --icon-fixed: #8696a0;
   --link: #53bdeb;
+  --line-divider: #8696a026;
   --message-background: #005c4b;
   --modal-background: #3b4a54;
   --modal-border-button: #8696a026;
   --modal-button-hover: #e9edef0d;
   --modal-backdrop: #0b141ad9;
-  --name: rgba(239, 239, 239, 0.826);
+  --name: #efefefd3;
   --text-primary: #E9EDEF;
   --text-secondary: #E9EDEF70;
   --text-confirmButton-modal: #111b21;
@@ -47,6 +48,7 @@ code {
 /* width */
 ::-webkit-scrollbar {
   width: 7px;
+  height: 7px;
 }
 
 /* Track */

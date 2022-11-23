@@ -1,3 +1,4 @@
+import ImageCard from "./img-card/ImageCard";
 import MessageCard from "./message-card/MessageCard";
 
 
@@ -6,12 +7,7 @@ export default function MsgType ({ el, id, chatId }) {
         case 'text':
             return <MessageCard el={el} id={id} chatId={chatId}/>;
         case 'img':
-            
-        break;
-        case 'rep':
-        
-        break;
-    
+            return <ImageCard el={el} id={id} chatId={chatId}/>
         default:
             break;
     }

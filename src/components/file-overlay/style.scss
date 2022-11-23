@@ -2,7 +2,7 @@
 .file-overlay-holder {
     display: none;
     position: absolute;
-    right: -120px;
+    right: -100px;
     justify-content: start;
     width: 100px;
     animation: show .3s linear;
@@ -12,6 +12,7 @@
         padding: 5px 10px;
         border-radius: 10px;
         width: fit-content;
+        font-size: 13px;
         font-weight: 600;
         white-space: nowrap;
     }

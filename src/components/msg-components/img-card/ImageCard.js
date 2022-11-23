@@ -31,11 +31,10 @@ export default function ImageCard({ el, id, chatId }) {
             ref={lastMessageRef}
             >
                 <div className='image-card-content'>
-                    <div></div>
-                    <p>{el.content}</p>
+                    <img src={el.image ?? el.image}></img>
                     <label style={el.autor === currentUser.email ? {right: '-12px'} : {left: '-12px', transform: 'scale(-1, 1)'}}/>
                 </div>
-                <div className='time' style={!(el.autor === currentUser.email) ? {right: '0px'} : {right: '-9px'}}>
+                <div className='time'>
                     <span id='image-card-time' >{el.time}</span>
                     {
                         el.autor === currentUser.email 
@@ -43,35 +42,33 @@ export default function ImageCard({ el, id, chatId }) {
                         : <></>
                     }
                 </div>
-                
-                {
-                    <>
-                        <button className='image-card-dropbutton' onClick={() => setDropdown(dropdownId)} 
-                            style={ dropdown ? {display: "flex", opacity: '1'} : {}}
+                <>
+                    <button className='image-card-dropbutton' onClick={() => setDropdown(dropdownId)} 
+                        style={ dropdown ? {display: "flex", opacity: '1'} : {}}
+                    >
+                    <IoIosArrowDown className='downArrow'/>
+                    </button>
+                    <DropMenu classname={'image-card-dropdown'} toggler={dropdown}
+                        order={() => setDropdown()} id={dropdownId}
+                        isMy={el.autor === currentUser.email}
+                    >
+                        <button>Responder</button>
+                        <button>Reagir à mensagem</button>
+                        <button>Encaminhar mensagem</button>
+                        <button>Favoritar mensagem</button>
+                        <button>Denunciar</button>
+                        <button 
+                            onClick={() => {
+                                if (el.autor === currentUser.email) {
+                                setModalDelete(true)
+                                } else {clearMessage(el.id, chatId, currentUser.email); setModalDelete(false)}
+                            }}
                         >
-                        <IoIosArrowDown className='downArrow'/>
+                            Apagar mensagem
                         </button>
-                        <DropMenu classname={'image-card-dropdown'} toggler={dropdown}
-                            order={() => setDropdown()} id={dropdownId}
-                            isMy={el.autor === currentUser.email}
-                        >
-                            <button>Responder</button>
-                            <button>Reagir à mensagem</button>
-                            <button>Encaminhar mensagem</button>
-                            <button>Favoritar mensagem</button>
-                            <button>Denunciar</button>
-                            <button 
-                                onClick={() => {
-                                    if (el.autor === currentUser.email) {
-                                    setModalDelete(true)
-                                    } else {clearMessage(el.id, chatId, currentUser.email); setModalDelete(false)}
-                                }}
-                            >
-                                Apagar mensagem
-                            </button>
-                        </DropMenu>
-                    </>
-                }
+                    </DropMenu>
+                </>
+                
             </div>
 
             <Modal

@@ -4,7 +4,7 @@
     min-width: 100px;
     max-width: 450px;
     flex-direction: column;
-    padding: 6px 7px 4px 9px;
+    padding: 5px 5px 1px 5px;
     width: fit-content;
     background-color: var(--message-background);
 
@@ -18,13 +18,10 @@
     }
 
     .image-card-content {
-        p {
-            display: flex;
-            word-break: break-all;
-            font-size: 14px;
-            margin: 0;
-            margin-right: 10px;
-            color: white;
+        img {
+            max-height: 600px;
+            max-width: 300px;
+            border-radius: 10px;
         }
 
         label {
@@ -39,9 +36,9 @@
 
     .time {
         display: flex;
-        position: relative;
-        justify-content: flex-end;
-        align-self: flex-end;
+        position: absolute;
+        bottom: 5px;
+        right: 0px;
         pointer-events: none;
 
         svg {
@@ -60,16 +57,15 @@
     .image-card-dropbutton {
         display: none;
         position: absolute;
-        right: 5px;
+        top: 8px;
+        right: 6px;
         border: 0;
         padding: 0;
         background-color: transparent;
 
         .downArrow {
-            display: flex;
             height: 18px;
-            width: 18px;
-            background-color: var(--message-background);
+            width: 18px; 
         }
     }
 
@@ -103,6 +99,7 @@
 }
 
 .image-card:hover {
+    cursor: pointer;
     .image-card-dropbutton {
         display: flex;
         animation: foward .3s;

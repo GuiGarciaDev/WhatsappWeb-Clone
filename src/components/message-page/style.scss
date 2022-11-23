@@ -209,7 +209,7 @@
             .bottom-content {
                 display: flex;
                 width: 100%;
-                padding: 6px 0 8px 0;
+                padding: 1px 0 8px 0;
 
                 button {
                     transition: .3s ease;
@@ -280,7 +280,7 @@
                             }
                         }
     
-                        button {
+                        button, label {
                             display: flex;
                             justify-content: center;
                             align-items: center;
@@ -290,6 +290,11 @@
                             height: 50px;
                             border-radius: 100%;
                             animation: showButton 300ms linear;
+                            cursor: pointer;
+
+                            input {
+                                display: none;
+                            }
 
                             svg {
                                 position: absolute;
@@ -316,7 +321,7 @@
                             }
                         }
     
-                        button:hover {
+                        button:hover, label:hover {
                             .file-overlay-holder {
                                 display: flex;
                                 transition: .3s linear ease; 
