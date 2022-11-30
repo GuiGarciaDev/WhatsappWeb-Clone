@@ -1,30 +1,64 @@
-.message-card {
+.document-card {
     display: flex;
     position: relative;
     min-width: 100px;
     max-width: 450px;
     flex-direction: column;
-    padding: 6px 7px 4px 9px;
+    padding: 5px 5px 1px 5px;
     width: fit-content;
     background-color: var(--message-background);
 
-    span {
-        display: flex;
-        color: var(--text-primary);
-        font-size: 12px;
-        margin-top: -4px;
-        margin-right: 4px;
-        align-self: flex-end;
+    .pdf-preview-holder {
+        min-width: 300px;
+        height: 100px;
+        background-color: red;
+        border-radius: 8px 8px 0 0;
+        background-color: var(--background-card-inside);
     }
 
-    .message-card-content {
-        p {
+    .document-card-content {
+        display: flex;
+        align-items: center;
+        min-width: 300px;
+        padding: 10px;
+        background-color: var(--background-card-inside);
+        cursor: pointer;
+
+        svg {
+            position: inherit;
+            align-self: flex-start;
+            width: 40px;
+            height: 40px;
+            fill: var(--icon-fixed);
+        }
+
+        .doc-text {
             display: flex;
-            word-break: break-all;
-            font-size: 14px;
-            margin: 0;
-            margin-right: 10px;
-            color: white;
+            align-items: flex-start;
+            flex-direction: column;
+
+            span {
+                font-size: 12px;
+                color: var(--text-secondary);
+            }
+
+            .title {
+                font-size: 14px;
+                color: var(--text-primary);
+            }
+        }
+
+        button {
+            padding: 5px;
+            border: 1px solid var(--icon-fixed);
+            border-radius: 50%;
+            margin-left: 120px;
+            cursor: pointer;
+
+            svg {
+                width: 25px;
+                height: 25px;
+            }
         }
 
         label {
@@ -39,10 +73,18 @@
 
     .time {
         display: flex;
-        position: relative;
-        justify-content: flex-end;
         align-self: flex-end;
+        padding: 5px 0 1px 0;
         pointer-events: none;
+
+        span {
+            display: flex;
+            color: var(--text-primary);
+            font-size: 12px;
+            margin-top: -4px;
+            margin-right: 4px;
+            align-self: flex-end;
+        }
 
         svg {
             position: relative;
@@ -57,24 +99,22 @@
         color: rgba($color: white, $alpha: 0.6);
     }
 
-    .message-card-dropbutton {
+    .document-card-dropbutton {
         display: none;
         position: absolute;
-        right: 5px;
         top: 15px;
+        right: 6px;
         border: 0;
         padding: 0;
         background-color: transparent;
 
         .downArrow {
-            display: flex;
             height: 18px;
-            width: 18px;
-            background-color: var(--message-background);
+            width: 18px; 
         }
     }
 
-    .message-card-dropdown {
+    .document-card-dropdown {
         flex-direction: column;
         position: absolute;
         transform-origin: top right;
@@ -103,8 +143,8 @@
       }
 }
 
-.message-card:hover {
-    .message-card-dropbutton {
+.document-card:hover {
+    .document-card-dropbutton {
         display: flex;
         animation: foward .3s;
         cursor: pointer;

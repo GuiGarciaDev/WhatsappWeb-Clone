@@ -5,37 +5,37 @@ import { BiSticker, BiText } from 'react-icons/bi';
 import { BsArrowReturnLeft, BsArrowReturnRight, BsEmojiSmile, BsPlusLg } from 'react-icons/bs'
 import { FaChessBoard } from 'react-icons/fa';
 import { MdCropRotate, MdModeEditOutline, MdSend } from 'react-icons/md';
+import { sendFile } from '../../API';
 import './style.scss'
 
-export default function PrevImgSection({docs, state}) {
+export default function PrevImgSection({docs, state, userEmail, contact}) {
     const [documents, setDocuments] = useState([]);
-    const [currentDoc, setCurrentDoc] = useState(null);
+    const [currentDoc, setCurrentDoc] = useState(docs[0]);
+    const [files, setFiles] = useState(Array.from(docs));
     const addInput = useRef()
 
-    function getUrl(array) {
-        let files = Object.values(array)
-        let filesArray = []
-        files.forEach(file => {
-            let url = URL.createObjectURL(file)
-            filesArray.push(url)
-        })
-        return filesArray
+    function getUrl(file) {
+        let url = URL.createObjectURL(file)
+
+        return url
     }
 
-    function removeUrl(url) {
-        let array = documents
-        let filteredArray = array.filter(item => item !== url)
-        setDocuments(filteredArray)
-
-        if (documents.length - 1 === 0) {
+    function removeUrl(file) {
+        if (files.length === 1) {
             state(false)
+        } else {
+            let array = files
+            let filteredArray = array.filter(item => item !== file)
+            setFiles(filteredArray)
         }
     }
 
-    useEffect(() => {
-        setCurrentDoc(getUrl(docs)[0])
-        setDocuments(getUrl(docs))
-    }, [])
+    function uploadImages(images) {
+        images.forEach(image => {
+            sendFile(image, userEmail, contact, 'img')
+        })
+        state(false)
+    }
 
     return (
         <div className="img-preview-section">
@@ -51,7 +51,7 @@ export default function PrevImgSection({docs, state}) {
                     <button><BsArrowReturnLeft/></button>
                     <button><BsArrowReturnRight/></button>
                 </div>
-                <img src={currentDoc} alt='kct'></img>
+                <img src={getUrl(currentDoc)} alt='kct'></img>
                 <div className="messageBar-holder">
                     <input id="messageBar" 
                         placeholder="Digite uma mensagem..."
@@ -61,15 +61,19 @@ export default function PrevImgSection({docs, state}) {
             </section>
             <section id='more-images'>
                 <div className='map-holder'>
-                    {
-                        documents.map((doc, idx) => {
+                    {                     
+                        files.map((file) => {
                             return (
-                                <button className='img-holder' onClick={() => setCurrentDoc(doc)}>
-                                    <img src={doc}></img>
+                                <div className='map-item'>
+                                    <button className='img-holder' onClick={() => {setCurrentDoc(file)}}>
+                                        <img src={getUrl(file)}></img>
+                                    </button>
                                     <div id='closeButton-holder'>
-                                        <button onClick={() => removeUrl(doc)}><AiOutlineClose/></button>
+                                        <button onClick={() => removeUrl(file)}>
+                                            <AiOutlineClose/>
+                                        </button>
                                     </div>
-                                </button>
+                                </div> 
                             )
                         })
                     }
@@ -83,13 +87,13 @@ export default function PrevImgSection({docs, state}) {
                         ref={addInput}
                         onInput={(e) => {
                             getUrl(e.target.files).forEach(doc => {
-                                setDocuments((prev) => [...prev, doc])
+                                setDocuments((prev) => [...prev, doc]) /// LOOK THIS 
                             })
                         }}
                     />
                 </label>
 
-                <button id='submit-images'><MdSend/></button>
+                <button id='submit-images' onClick={() => uploadImages(files)}><MdSend/></button>
             </section>
         </div>
     )

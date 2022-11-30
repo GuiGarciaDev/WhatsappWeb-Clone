@@ -4,7 +4,7 @@
     min-width: 100px;
     max-width: 450px;
     flex-direction: column;
-    padding: 5px 5px 1px 5px;
+    padding: 5px 5px 5px 5px;
     width: fit-content;
     background-color: var(--message-background);
 
@@ -18,6 +18,12 @@
     }
 
     .image-card-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 100px;
+        min-height: 100px;
+
         img {
             max-height: 600px;
             max-width: 300px;
@@ -37,8 +43,8 @@
     .time {
         display: flex;
         position: absolute;
-        bottom: 5px;
-        right: 0px;
+        bottom: 8px;
+        right: 3px;
         pointer-events: none;
 
         svg {
@@ -57,7 +63,7 @@
     .image-card-dropbutton {
         display: none;
         position: absolute;
-        top: 8px;
+        top: 15px;
         right: 6px;
         border: 0;
         padding: 0;

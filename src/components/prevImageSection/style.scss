@@ -101,7 +101,7 @@ button {
             padding-bottom: 10px;
             margin-top: 17px;
 
-            .img-holder {
+            .map-item {
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -110,8 +110,6 @@ button {
                 height: 60px;
                 border-radius: 5px;
                 border: 3px solid white;
-                background-color: transparent;
-                cursor: pointer;
                 overflow: hidden;
 
                 &:hover, &:focus {
@@ -122,15 +120,28 @@ button {
                     }
                 }
 
-                img {
-                    max-width: 60px;
-                    max-height: 60px;
+                .img-holder {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 5px;
+                    background-color: transparent;
+    
+                    p {
+                        color: white;
+                        font-size: 9px;
+                    }
+    
+                    img {
+                        max-width: 60px;
+                        max-height: 60px;
+                    }
                 }
 
                 #closeButton-holder {
                     position: absolute;
                     top: 0;
                     right: 0;
+                    cursor: pointer;
                     transition: .2s ease;
                     border-radius: 0 0 0 7px;
                     transform: scale(0);
@@ -149,6 +160,7 @@ button {
                         height: 18px;
                     }
                 }
+                 
             }
         }
 

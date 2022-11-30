@@ -2,10 +2,10 @@ import "../message-page/style.scss";
 import { firedb as db } from "../../firebase";
 import React, { useEffect, useRef, useState } from "react";
 import { denunceTextModal } from "../../modalSettings";
-import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc, limit, getDoc, deleteDoc, where, getDocs } from "firebase/firestore";
+import { collection, doc, onSnapshot, orderBy, query, updateDoc, where, getDocs } from "firebase/firestore";
+import { uploadMessage, uploadRepMessage } from "../../API";
 
 import { useAuth } from "../../contexts/AuthContext";
-import { getDate, getFullDate, getTime } from "../../date";
 import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
 import MessageDate from "../message-date/MessageDate";
@@ -16,17 +16,18 @@ import TwoOptionsModal from "../2opt-modal/TwoOptionsModal";
 import EmojiPicker from "emoji-picker-react";
 // import data from '@emoji-mart/data'
 // import Picker from '@emoji-mart/react'
-
-import { BiSticker } from 'react-icons/bi';
-import { BsFillImageFill, BsCameraFill, BsEmojiSmile } from 'react-icons/bs';
-import { IoMdDocument } from 'react-icons/io';
-import { HiUser, HiArrowLeft } from 'react-icons/hi';
-import { RiStickyNoteFill, RiCloseFill } from 'react-icons/ri';
-import { FaArrowRight, FaMicrophone } from 'react-icons/fa';
-import { AiOutlineGif, AiOutlinePaperClip } from 'react-icons/ai';
 import MsgType from "../msg-components/MsgType";
 import PrevDocSection from "../prevDocumentSection/PrevDocSection";
 import PrevImgSection from "../prevImageSection/PrevImgSection";
+import Replied from "../replied/Replied";
+
+import {
+    BiSticker, BsFillImageFill, BsCameraFill, 
+    BsEmojiSmile,IoMdDocument,HiUser, HiArrowLeft, 
+    RiStickyNoteFill, RiCloseFill, FaArrowRight,
+    FaMicrophone, AiOutlineGif, AiOutlinePaperClip
+} from '../../icons'
+import { useData } from "../../contexts/MessageContext";
 
 
 export default function MessagePage({ id, chatId, closeFunction }) { 
@@ -48,6 +49,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     const [modalDeleteConversation, setModalDeleteConversation] = useState(false); // Modal for delete all messages
 
     const { currentUser } = useAuth()
+    const { repMessage, setRepMessage } = useData()
     const chatboxInput = useRef();
 
     const [contact, setContact] = useState('')
@@ -69,7 +71,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
           };
     }, [])
 
-    // const pickerHolder = useRef()
+    // const pickerHolder = useRef()  // Responsivity of component EmojiPicker 
     // const [pickerWidth, setPickerWidth] = useState(null);
 
     // useEffect(() => {
@@ -104,25 +106,6 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             })
         }
 
-        async function updateLastMessageIn(doc, email, lastMessage) {
-            const ref = await getDoc(doc)
-            const data = ref.data()
-
-            try {
-                await updateDoc(doc, {
-                    "last_message": {
-                        ...data.last_message,
-                        [email]: [
-                            lastMessage[0].content, 
-                            lastMessage[0].cardDate, 
-                            lastMessage[0].read, 
-                            lastMessage[0].autor,
-                        ]
-                    }
-                })
-            } catch (error) {}
-        }
-
         onSnapshot(contactRef, orderBy('time', 'desc'), (snapshot) => {
           setContact(snapshot.data());
         })
@@ -138,7 +121,6 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             })
             setMessages(AllMessages);
 
-            //let AllMessages = snapshot.docs.map((message) => (message.data()))
             let MessageDate = []
             let prevDate = ''
             for (let i = 0; i < AllMessages.length; i++) {
@@ -150,47 +132,22 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             setMessageDate(MessageDate)
             updateReadStatus()
         })
-
-        const lastMessage = query(messagesRef, orderBy('date', 'desc'), limit(1))
-
-        onSnapshot(lastMessage, (snapshot) => {
-            try {
-                let lastMessage = snapshot.docs.map((lastmessage) => (lastmessage.data()))
-                updateLastMessageIn(contactRef, currentUser.email, lastMessage)
-                updateLastMessageIn(userRef, id, lastMessage)
-            } catch (error) {console.log(error);}
-        })
     }, [id])
 
     // Default image for all users
     const user_image = contact.photoUrl ? contact.photoUrl : "noImage.png";
 
-    async function sendMessage( chatId ) { // Send message to your friend
-        const chatMessages = collection(db, "chat", chatId, 'messages')
-
+    async function sendMessage() { // Send message to your friend
         const searchbar = document.getElementById("bottom-messageBar")
 
         if (searchbar.value.length > 0) {
-            addDoc(chatMessages, { // Message sent to chatId room
-                "content": searchbar.value,
-                "time": getTime(),
-                "date": getFullDate(),
-                "cardDate": getDate(),
-                "read": false,
-                "autor": currentUser.email,
-                "for": id,
-                "clearedFor": {},
-                "type": 'text',
-            }).then(function (docRef) {
-                updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
-                    "id": docRef.id
-                })
-                updateDoc(doc(db, 'users', id), {
-                    'messages_not_readed': {
-                        [currentUser.email]: (contact.messages_not_readed[currentUser.email] + 1)
-                    }
-                })
-            })
+            if (repMessage[0]) {
+                uploadRepMessage(currentUser.email, contact, searchbar.value, repMessage[1].id)
+                setRepMessage(prev => [false, prev[1]])
+            } else {
+                uploadMessage(currentUser.email, contact, searchbar.value)
+            }
+            
 
             searchbar.value = "";
             setSearchBarLength(0);
@@ -200,10 +157,9 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     function changeDocType(type, docs, sectionState) {
         switch (type) {
             case 'doc':
-                return <PrevDocSection docs={docs} state={sectionState}/>
+                return <PrevDocSection docs={docs} state={sectionState} userEmail={currentUser.email} contact={contact}/>
             case 'img':
-                return <PrevImgSection docs={docs} state={sectionState}/>
-        
+                return <PrevImgSection docs={docs} state={sectionState} userEmail={currentUser.email} contact={contact}/>
             default:
                 break;
         }
@@ -258,23 +214,17 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                     return (
                                         <>
                                             <MessageDate date={date}/>
-                                            {
-                                                messages.map((message, idx) => {
+                                            { messages.map((message, idx) => {
                                                     if (message.cardDate === date) {
                                                         return (
-                                                            <MsgType el={message} id={idx} chatId={chatId}/>
+                                                            <MsgType el={message} id={idx} chatId={chatId} />
                                                         )
                                                     }
                                                 })
                                             }
-                                        
                                         </>
                                     )
                                 })
-                            }
-                            
-                            {
-                                
                             }
                         </section>
                         
@@ -294,6 +244,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                     perLine={Math.ceil(pickerWidth / 38) ? Math.ceil(pickerWidth / 38) : 22}
                                 />
                             </div> */}
+                            <Replied/>
                             <div className="bottom-content">
                                 <div className="bottom-start">
                                     <button onClick={() => setEmojiSec(prev => !prev)}>
@@ -382,13 +333,11 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                 <div className="bottom-end">
                                     <button id='sendMessageButton' 
                                     style={{marginRight: '10px'}}
-                                    onClick={() => sendMessage(chatId, 'text')}
+                                    onClick={() =>  sendMessage()}
                                     >
-                                        {
-                                            searchbarlength > 0 ?
-                                            <FaArrowRight/>
-                                            :
-                                            <FaMicrophone/>
+                                        { searchbarlength > 0 
+                                            ? <FaArrowRight/>
+                                            : <FaMicrophone/>
                                         }   
                                     </button>
                                 </div>

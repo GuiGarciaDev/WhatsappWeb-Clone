@@ -4,6 +4,7 @@ import {createRoot} from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { DataProvider } from './contexts/MessageContext';
 
 import './index.css';
 import App from './pages/App.js';
@@ -19,21 +20,23 @@ document.title = "WhatsApp";
 root.render(
   <StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <App />
-              </PrivateRoute>
-            }
-          />
-          <Route path='/login' element={<Login/>}></Route>
-          <Route path='/register' element={<Register/>}></Route>
-          <Route path='/forgot-password' element={<ForgotPassword/>}></Route>
-        </Routes>
-      </BrowserRouter>
+      <DataProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <App />
+                  </PrivateRoute>
+                }
+              />
+              <Route path='/login' element={<Login/>}></Route>
+              <Route path='/register' element={<Register/>}></Route>
+              <Route path='/forgot-password' element={<ForgotPassword/>}></Route>
+            </Routes>
+          </BrowserRouter>
+        </DataProvider>
     </AuthProvider>
   </StrictMode>
 );

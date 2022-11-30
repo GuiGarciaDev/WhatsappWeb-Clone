@@ -2,7 +2,7 @@ import './style.scss'
 import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-export default function Pdf({docUrl, files, idx}) {
+export default function Pdf({docUrl, files, idx, preview}) {
 	
 pdfjs.GlobalWorkerOptions.workerSrc =
 `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -33,36 +33,21 @@ function nextPage() {
 }
 
 return (
-    <div className="pdf">
-        <div className='title-holder'>
-            <p>{files[idx].name}</p>
-            <span>{`${numPages} página(s)`}</span>
-        </div>
+    <div className={preview ? "preview" : "pdf"}>
+        { preview
+            ? <div className='title-holder'>
+                <p>{files[idx].name}</p>
+                <span>{`${numPages} página(s)`}</span>
+            </div>
+            : <></>
+        }
+        
         <Document
             file={docUrl}
             onLoadSuccess={onDocumentLoadSuccess}
         >
             <Page pageNumber={pageNumber} width={300}/>
         </Document>
-        <div>
-            {/* <div className="buttonc">
-                <button
-                type="button"
-                disabled={pageNumber <= 1}
-                onClick={previousPage}
-                className="Pre"   
-                >
-                    Previous
-                </button>
-                <button
-                type="button"
-                disabled={pageNumber >= numPages}
-                onClick={nextPage}
-                >
-                    Next
-                </button> 
-            </div> */}
-        </div>
     </div>
     )
 }

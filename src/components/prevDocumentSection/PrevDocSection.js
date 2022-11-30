@@ -4,13 +4,14 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs'
 import { HiDocument } from 'react-icons/hi'
 import { MdSend } from 'react-icons/md';
+import { sendFile } from '../../API';
 import Pdf from '../pdf-component/Pdf';
 import './style.scss'
 
-export default function PrevDocSection({docs, state}) {
+export default function PrevDocSection({docs, state, userEmail, contact}) {
     const [documents, setDocuments] = useState(getUrl(docs));
     const [currentDoc, setCurrentDoc] = useState(getUrl(docs)[0]);
-    const [files, setFiles] = useState(docs);
+    const [files, setFiles] = useState(Array.from(docs));
     const [fileIdx, setFileIdx] = useState(0);
     const addInput = useRef()
 
@@ -40,7 +41,14 @@ export default function PrevDocSection({docs, state}) {
         } catch {}
     }
 
-    console.log(files);
+    function uploadDocuments(documents) {
+        documents.forEach(doc => {
+            doc.type === 'application/pdf' 
+            ? sendFile(doc, userEmail, contact, 'pdf')
+            : sendFile(doc, userEmail, contact, 'doc')
+        })
+        state(false)
+    }
 
     return (
         <div className="docs-preview-section">
@@ -106,7 +114,7 @@ export default function PrevDocSection({docs, state}) {
                     />
                 </label>
 
-                <button id='submit-docs'><MdSend/></button>
+                <button id='submit-docs' onClick={() => uploadDocuments(files)}><MdSend/></button>
             </section>
         </div>
     )

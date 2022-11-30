@@ -1,0 +1,74 @@
+
+.rep-all {
+    display: flex;
+    position: relative;
+    align-items: center;
+    overflow: hidden;
+    transition: .2s ease;
+    width: 100%;
+
+    .message {
+        display: flex;
+        position: relative;
+        width: 100%; //Change to make responsive
+        height: 60px;
+        margin-left: 50px;
+        margin-right: 60px;
+        background-color: var(--background-left);
+        border-radius: 8px 0 0 8px;
+        column-gap: 10px;
+        align-items: center;
+
+        p {
+            margin: 0;
+        }
+
+        span {
+            height: 100%;
+            width: 10px;
+            background-color: var(--rep-primary);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .autorContent {
+            .autor {
+                color: var(--rep-primary);
+            }
+
+            .file-description {
+                display: flex;
+                align-items: center;
+                column-gap: 6px;
+                color: var(--text-secondary);
+            }
+
+            svg {
+                color: var(--icon-fixed);
+            }
+
+            p {
+                color: var(--text-secondary);
+                margin-bottom: 1px;
+            }
+        }
+
+        img {
+            position: absolute;
+            right: 0;
+            height: 100%;
+        }
+    }
+
+    button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        cursor: pointer;
+
+        svg {
+            width: 25px;
+            height: 25px;
+            color: var(--icon-fixed);
+        }
+    }
+}

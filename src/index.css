@@ -3,6 +3,7 @@
   --background-right: #222e35;
   --background-left: #111b21;
   --background-friend-profile: #0c1317;
+  --background-card-inside: #025144;
   --background-confirmButton-modal: #00a884;
   --background-confirmButtonHover-modal: #06cf9c;
   --primary-green: #00a884;
@@ -25,6 +26,9 @@
   --modal-button-hover: #e9edef0d;
   --modal-backdrop: #0b141ad9;
   --name: #efefefd3;
+  --rep-primary: #00a884;
+  --rep-2: #53bdeb;
+  --rep-3: #00a884;
   --text-primary: #E9EDEF;
   --text-secondary: #E9EDEF70;
   --text-confirmButton-modal: #111b21;
