@@ -1,3 +1,4 @@
+import ContactCard from "./contact-card/ContactCard";
 import FileCard from "./file-card/FileCard";
 import ImageCard from "./img-card/ImageCard";
 import MessageCard from "./message-card/MessageCard";
@@ -17,7 +18,7 @@ export default function MsgType ({ el, id, chatId }) {
         case 'rep':
             return <RepCard el={el} id={id} chatId={chatId}/>
         case 'contact':
-            return <></>
+            return <ContactCard el={el} id={id} chatId={chatId}/>
         case 'sticker':
             return <></>
         default:

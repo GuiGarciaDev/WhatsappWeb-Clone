@@ -1,10 +1,11 @@
+import { AiOutlineClose, AiOutlineGif, AiOutlinePaperClip, AiFillCamera } from 'react-icons/ai';
 import { BiSticker } from 'react-icons/bi';
 import { BsFillImageFill, BsCameraFill, BsEmojiSmile, BsCheckAll } from 'react-icons/bs';
-import { IoMdDocument, IoIosArrowDown } from 'react-icons/io';
-import { HiDocument, HiUser, HiArrowLeft } from 'react-icons/hi';
-import { RiStickyNoteFill, RiCloseFill } from 'react-icons/ri';
 import { FaArrowRight, FaMicrophone } from 'react-icons/fa';
-import { AiOutlineClose, AiOutlineGif, AiOutlinePaperClip, AiFillCamera } from 'react-icons/ai';
+import { HiDocument, HiUser, HiArrowLeft } from 'react-icons/hi';
+import { IoMdDocument, IoIosArrowDown, IoMdSend } from 'react-icons/io';
+import { MdClose } from 'react-icons/md';
+import { RiStickyNoteFill, RiCloseFill } from 'react-icons/ri';
 
 export {
     AiOutlineClose,
@@ -18,11 +19,13 @@ export {
     BsEmojiSmile,
     FaArrowRight,
     FaMicrophone,
-    IoMdDocument,
-    IoIosArrowDown,
     HiDocument,
     HiUser, 
     HiArrowLeft, 
+    IoMdDocument,
+    IoIosArrowDown,
+    IoMdSend,
+    MdClose,
     RiStickyNoteFill, 
     RiCloseFill, 
 }

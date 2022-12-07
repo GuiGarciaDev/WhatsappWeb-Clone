@@ -29,8 +29,7 @@ import {
 } from '../../icons'
 import { useData } from "../../contexts/MessageContext";
 
-
-export default function MessagePage({ id, chatId, closeFunction }) { 
+export default function MessagePage({ currentContact, chatId, closeFunction }) { 
     const [rightmenu, setRightMenu] = useState(null);
     const [emojiSec, setEmojiSec] = useState(false);
     const [previewSec, setPreviewSec] = useState(false)
@@ -49,10 +48,10 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     const [modalDeleteConversation, setModalDeleteConversation] = useState(false); // Modal for delete all messages
 
     const { currentUser } = useAuth()
-    const { repMessage, setRepMessage } = useData()
+    const { repMessage, setRepMessage, setSendContactModal } = useData()
     const chatboxInput = useRef();
 
-    const [contact, setContact] = useState('')
+    //const [contact, setContact] = useState();
     const [messages, setMessages] = useState([])
     const [messageDate, setMessageDate] = useState([])
 
@@ -88,7 +87,6 @@ export default function MessagePage({ id, chatId, closeFunction }) {
 
     useEffect(() => {
         const userRef = doc(db, 'users', currentUser.email);
-        const contactRef = doc(db, "users", id)
         const messagesRef = collection(db, "chat", chatId, 'messages')
 
         async function updateReadStatus() {
@@ -101,14 +99,10 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             })
             updateDoc(userRef, {
                 'messages_not_readed': {
-                    [id]: 0 
+                    [currentContact.email]: 0 
                 }
             })
         }
-
-        onSnapshot(contactRef, orderBy('time', 'desc'), (snapshot) => {
-          setContact(snapshot.data());
-        })
 
         const allMessages = query(messagesRef, orderBy('date', 'asc'))
 
@@ -132,22 +126,21 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             setMessageDate(MessageDate)
             updateReadStatus()
         })
-    }, [id])
+    }, [currentContact])
 
     // Default image for all users
-    const user_image = contact.photoUrl ? contact.photoUrl : "noImage.png";
+    const user_image = currentContact.photoUrl ? currentContact.photoUrl : "noImage.png";
 
     async function sendMessage() { // Send message to your friend
         const searchbar = document.getElementById("bottom-messageBar")
 
         if (searchbar.value.length > 0) {
             if (repMessage[0]) {
-                uploadRepMessage(currentUser.email, contact, searchbar.value, repMessage[1].id)
+                uploadRepMessage(currentUser.email, currentContact, searchbar.value, repMessage[1].id)
                 setRepMessage(prev => [false, prev[1]])
             } else {
-                uploadMessage(currentUser.email, contact, searchbar.value)
+                uploadMessage(currentUser.email, currentContact, searchbar.value)
             }
-            
 
             searchbar.value = "";
             setSearchBarLength(0);
@@ -157,9 +150,9 @@ export default function MessagePage({ id, chatId, closeFunction }) {
     function changeDocType(type, docs, sectionState) {
         switch (type) {
             case 'doc':
-                return <PrevDocSection docs={docs} state={sectionState} userEmail={currentUser.email} contact={contact}/>
+                return <PrevDocSection docs={docs} state={sectionState} userEmail={currentUser.email} contact={currentContact}/>
             case 'img':
-                return <PrevImgSection docs={docs} state={sectionState} userEmail={currentUser.email} contact={contact}/>
+                return <PrevImgSection docs={docs} state={sectionState} userEmail={currentUser.email} contact={currentContact}/>
             default:
                 break;
         }
@@ -174,10 +167,10 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                             { window.innerWidth < 630 && <HiArrowLeft onClick={() => closeFunction(false)}/>}
                             <img src={user_image} alt=""></img>
                             <div className="text-holder">
-                                <h1>{contact.name}</h1>
+                                <h1>{currentContact.name}</h1>
                                 <span>
                                     {
-                                        contact.online ? "online" : "visto por último online às " + contact.last_connection
+                                        currentContact.online ? "online" : "visto por último online às " + currentContact.last_connection
                                     }
                                 </span>
                             </div>
@@ -209,8 +202,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                     ? changeDocType(docType, documents, setPreviewSec)
                     : <>
                         <section id="chatbox">
-                            {
-                                messageDate.map((date) => {
+                            {messageDate.map((date) => {
                                     return (
                                         <>
                                             <MessageDate date={date}/>
@@ -274,7 +266,9 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                                         </button>
                                         { filedropup ? 
                                             <div className="fileDropup">
-                                                <button style={{backgroundColor: '#0795dc'}}>
+                                                <button style={{backgroundColor: '#0795dc'}}
+                                                    onClick={() => setSendContactModal(true)}
+                                                >
                                                     <span style={{backgroundColor: '#0eabf4'}}></span>
                                                     <HiUser/>
                                                     <FileOverlay color={'white'} title={'Contato'}/>
@@ -350,12 +344,12 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                 <section id="friend-Mid">
                     <div className="profile-image-name">
                         <img src={user_image} alt=""></img>
-                        <h2>{contact.name}</h2>
-                        <span>{contact.email}</span>
+                        <h2>{currentContact.name}</h2>
+                        <span>{currentContact.email}</span>
                     </div>
                     <div className="profile-message">
                         <span>Recado</span>
-                        <span className="profile-text">{contact.status}</span>
+                        <span className="profile-text">{currentContact.status}</span>
                     </div>
                     <div className="profile-files">
                         <button className="file-frow">
@@ -380,10 +374,10 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                             subtitle="As mensagens são protegidas com a criptografia de ponta a ponta.
                             Clique para confirmar"
                         />
-                        <ProfileButton icon="denied.svg" title={"Bloquear " + contact.name} red={true} name={'red'}
+                        <ProfileButton icon="denied.svg" title={"Bloquear " + currentContact.name} red={true} name={'red'}
                             funct={() => setModalBlock(true)}
                         />
-                        <ProfileButton icon="dislike.svg" title={"Denunciar " + contact.name} red={true} name={"red"}
+                        <ProfileButton icon="dislike.svg" title={"Denunciar " + currentContact.name} red={true} name={"red"}
                             funct={() => setModalDenunce(true)}
                         />
                         <ProfileButton icon="trash.svg" title={"Apagar Conversa"} red={true} name={'red'}
@@ -402,7 +396,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
                             arrowId={"rightC-arrow"} searchId={"rightC-search"}
                         />
                     </div>
-                    <span className="search-span">Pesquisar mensagens com {contact.name}</span>
+                    <span className="search-span">Pesquisar mensagens com {currentContact.name}</span>
                 </section>
             </RightSideMenu>
 
@@ -423,7 +417,7 @@ export default function MessagePage({ id, chatId, closeFunction }) {
             />
 
             <TwoOptionsModal 
-                title={`Deseja bloquear ${contact.name}?`}
+                title={`Deseja bloquear ${currentContact.name}?`}
                 confirmButton={'BLOQUEAR'} cancelButton={'CANCELAR'}
                 text={'Contatos bloqueados não poderão mais fazer chamadas nem enviar mensagens para você.'}
                 state={modalBlock} closeFunction={() => setModalBlock(false)} 

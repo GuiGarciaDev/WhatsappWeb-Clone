@@ -26,6 +26,10 @@ import { RiImageEditFill } from 'react-icons/ri';
 import { VscSymbolKey } from 'react-icons/vsc'; 
 import { useEffect } from 'react';
 import { getFullDateWithSpace } from '../date';
+import { BsFilter } from 'react-icons/bs';
+import { useData } from '../contexts/MessageContext';
+import SendContactModal from '../components/send-contact-modal/SendContactModal';
+import { generateId } from '../API';
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
@@ -41,26 +45,25 @@ export default function App() {
   const [cardActived, setCardActived] = useState('');
   const [editEmail, setEditEmail] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
-  const [filter, setFilter] = useState(true);
+  const [filter, setFilter] = useState(false);
+
+  const { sendContactModal } = useData()
 
   const [newContactModal, setNewContactModal] = useState(false) // Open / close modal for add new contact
   
   //const [hasFavorite, setHasFavorite] = useState(false);
-  let hasFavorite = false; // Just for stop advide about non use setHasFavorite yet
+  let hasFavorite = false; // Just for stop advice about non use setHasFavorite yet
 
   const [dropdown, setDropdown] = useState(null);
   
   const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
 
-  function changePage(email, idx) { // Search for better way to do this...
-    
-    const newChatId = currentUser.email > email 
-      ? currentUser.email + email
-      : email + currentUser.email
+  function changePage(contact, idx) { // Search for better way to do this...
+    //setFriendIndex(email)
 
-    setFriendIndex(email)
+    setContact(contact)
     setMessagePage(true)
-    setChatId(newChatId)
+    setChatId(generateId(currentUser.email, contact.email))
     setCardActived(idx)
   }
 
@@ -91,17 +94,6 @@ export default function App() {
     )
   }
 
-  function toggleFilter() {
-    setFilter(!filter);
-
-    if (filter) {
-      document.getElementById("filterButton").name = "filterActived";
-    } else {
-      document.getElementById("filterButton").name = "";
-    }
-
-  }
-
   // Responsive width
   const [windowSize, setWindowSize] = useState(getWindowSize());
 
@@ -130,7 +122,7 @@ export default function App() {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
   
-  const [user, setUser] = useState([]) // users/user
+  const { user, setUser, contact, setContact } = useData()
   const [contacts, setContacts] = useState([]) // users/user => other users tha you have added
 
   const [email, setEmail] = useState('')
@@ -140,7 +132,6 @@ export default function App() {
   const contactsRef = collection(db, "users")
 
   useEffect(() => {
-
     async function putContact(contacts) {
       setContacts([])
       let contactsArray = []
@@ -151,10 +142,6 @@ export default function App() {
           contactsArray.push(contact.data())
           setContacts(contactsArray.map((contact) => contact))
         })
-        // onSnapshot(q, (snapshot) => {
-        //   contactsArray.push(snapshot.docs.map((contact) => ({...contact.data()})))
-        //   setContacts(contactsArray.map((contact) => contact[0]))
-        // })
       }
     }
     onSnapshot(userRef, (snapshot) => {
@@ -165,8 +152,6 @@ export default function App() {
     })   
   }, [])
 
-
-  let numSaved = contacts.length;
   let user_image = user.photoUrl ? user.photoUrl : 'noImage.png'
 
   async function addContact (email) {
@@ -250,22 +235,31 @@ export default function App() {
                 order={changePage}
               />
             </div>
-            <button id='filterButton' onClick={() => toggleFilter()}>
-              <img src='filter.svg' alt='' id='filter'></img>
+            <button id='filterButton' 
+              onClick={() => setFilter(prev => !prev)}
+              style={filter ? {backgroundColor: 'var(--down-border)'} : {backgroundColor: 'transparent'}}
+            >
+              <BsFilter />
             </button>
           </div>
           
           <div className="content-holder">
-            { filter ? //TODO: Check if the user have contact, if dont, display some message with button
+            { !filter ?
                 <>
                   {                  
                     contacts.map((contact, idx) => {
                       try {
                         return (
-                          <Card title={contact.name} content={user.last_message[contact.email][0]} id={idx}
-                            date={user.last_message[contact.email][1]} image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
-                            key={idx} active={cardActived} read={user.last_message[contact.email][2]}
-                            order={() => changePage(contact.email, idx)}
+                          <Card 
+                            title={contact.name} 
+                            content={user.last_message[contact.email][0]} 
+                            id={idx}
+                            date={user.last_message[contact.email][1]} 
+                            image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
+                            key={idx} 
+                            active={cardActived} 
+                            read={user.last_message[contact.email][2]}
+                            order={() => changePage(contact, idx)}
                             isMy={!(user.last_message[contact.email][3] === contact.email)}
                             notReaded={user.messages_not_readed[contact.email]}
                           />
@@ -278,7 +272,7 @@ export default function App() {
               <div className='filter-content-holder'>
                 <div className='filter-main'>
                   <span>Nenhuma conversa não lida</span>
-                  <button onClick={() => toggleFilter()}>Limpar Filtro</button>
+                  <button onClick={() => setFilter(false)}>Limpar Filtro</button>
                 </div>
                 <div className='filter-bottom'>
                   <img src='lock.svg' alt=''></img>
@@ -390,7 +384,7 @@ export default function App() {
 
             <div className='nMessage-cards-map'>
               {
-                numSaved === 0 ? 
+                contacts.length === 0 ? 
                   <span>
                     Você ainda não tem contatos, tente 
                     <a href='https://github.com/Guilherme-ds-Garcia'> adicionar </a> 
@@ -515,7 +509,7 @@ export default function App() {
 
       <div id="right-column" style={messagePage && windowSize.innerWidth < 630 ? {width: '100%'} : windowSize.innerWidth > 630 ? {width: '100%'} : {width: '0'}}>
         {
-          messagePage ? <MessagePage id={friendIndex} chatId={chatId} closeFunction={setMessagePage}/> : <DefaultPage/>
+          messagePage ? <MessagePage currentContact={contact} chatId={chatId} closeFunction={setMessagePage}/> : <DefaultPage/>
         }
       </div>
 
@@ -531,6 +525,8 @@ export default function App() {
             <button className='confirmButton' onClick={() => addContact(email)}>ADICIONAR</button>
         </div>
       </NewContactModal>
+
+      <SendContactModal openState={sendContactModal} contacts={contacts}/>
     </div>
   )
 }

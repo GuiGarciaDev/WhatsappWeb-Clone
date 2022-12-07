@@ -1,9 +1,9 @@
 import './style.scss';
 
-export default function CustomCheckBox() {
+export default function CustomCheckBox({id, value, onChange}) {
     return (
         <div className='checkbox-holder'>
-            <input type="checkbox"></input>
+            <input id={id} type="checkbox" value={value} onChange={onChange}></input>
         </div>
     )
 }

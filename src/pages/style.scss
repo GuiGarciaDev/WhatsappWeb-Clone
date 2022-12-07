@@ -141,28 +141,17 @@
         }
 
         #filterButton {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          align-self: flex-start;
-          margin-top: 10px;
-          border: 0;
-          width: 28px;
-          height: 28px;
+          margin-right: 5px;
           border-radius: 50%;
           transition: .2s ease-in-out;
-        }
-
-        #filter {
-          height: 18px;
-          cursor: pointer;
-          opacity: 0.6;
-          filter: invert(100%) sepia(0%) saturate(7484%) hue-rotate(184deg) brightness(112%) contrast(97%);
-        }
-
-        button[name="filterActived"] {
           border-radius: 50%;
-          background-color: var(--down-border);
+          cursor: pointer;
+
+          svg {
+            color: var(--icon-fixed);
+            width: 23px;
+            height: 23px;
+          }
         }
       }
 
