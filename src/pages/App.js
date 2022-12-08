@@ -4,32 +4,33 @@ import Card from '../components/card';
 import DefaultPage from '../components/default-page/DefautlPage';
 import MessagePage from '../components/message-page/MessagePage';
 import SearchBar from '../components/searchbar/SearchBar';
-import DropMenu from '../components/dropmenu/DropMenu'; 
 import LeftSideMenu from '../components/left-sidemenu/LeftSideMenu';
 import DividerLetter from '../components/divider-letter/DividerLetter';
 import ConfigCard from '../components/config-card/ConfigCard';
 import NewContactModal from '../components/new-contact-modal/NewContactModal';
+import SendContactModal from '../components/send-contact-modal/SendContactModal';
+import LeftDropDown from '../components/dropdown/left-dropdown/LeftDropDown';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useData } from '../contexts/MessageContext';
 import { firedb as db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { collection, doc, getDoc, getDocs, getDocsFromCache, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { generateId, getContactWithId } from '../API';
+import { getFullDateWithSpace } from '../date';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { AiOutlineUserAdd, AiFillBell, AiOutlineCheck } from 'react-icons/ai';
 import { BiShieldQuarter } from 'react-icons/bi';
+import { BsFilter, BsThreeDotsVertical, BsChatLeftTextFill } from 'react-icons/bs';
 import { HiDocumentText } from 'react-icons/hi'; 
 import { IoMdHelpCircle } from 'react-icons/io'; 
 import { MdGroup, MdLock, MdBrightnessMedium, MdModeEdit } from 'react-icons/md'; 
 import { RiImageEditFill } from 'react-icons/ri'; 
+import { SiStatuspage } from 'react-icons/si'; 
 import { VscSymbolKey } from 'react-icons/vsc'; 
-import { useEffect } from 'react';
-import { getFullDateWithSpace } from '../date';
-import { BsFilter } from 'react-icons/bs';
-import { useData } from '../contexts/MessageContext';
-import SendContactModal from '../components/send-contact-modal/SendContactModal';
-import { generateId } from '../API';
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
@@ -38,8 +39,6 @@ export default function App() {
 
   const [messagePage, setMessagePage] = useState(false); // Controls the right column -> Talk page
   const [leftmenu, setLeftMenu] = useState(null);        // Controls the state of left menus
-
-  const [friendIndex, setFriendIndex] = useState('');     // Send index of friend in db to talk page
 
   const [editName, setEditName] = useState(false);
   const [cardActived, setCardActived] = useState('');
@@ -59,8 +58,6 @@ export default function App() {
   const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
 
   function changePage(contact, idx) { // Search for better way to do this...
-    //setFriendIndex(email)
-
     setContact(contact)
     setMessagePage(true)
     setChatId(generateId(currentUser.email, contact.email))
@@ -68,13 +65,10 @@ export default function App() {
   }
 
   function addConversation(email) {
-    const newChatId = currentUser.email > email 
-      ? currentUser.email + email
-      : email + currentUser.email
-
-    setFriendIndex(email);
+    const contact = getContactWithId(email)
+    setContact(contact)
     setMessagePage(true);
-    setChatId(newChatId)
+    setChatId(generateId(currentUser.email, contact.email))
     setLeftMenu(false)
   }
 
@@ -206,23 +200,24 @@ export default function App() {
           </button>
           <div className='up-icon-holder'>
             <button>
-              <img src="status-icon.svg" alt='' id="icon1"></img>
+              <SiStatuspage />
             </button>
             <button onClick={() => setLeftMenu('newMessageMenu')}>
-              <img src='message-icon.svg' alt='' id="icon2"></img>
+              <BsChatLeftTextFill />
             </button>
             <div className='leftDropdown-holder'>
               <button id='leftDropdown-button' onClick={() => toggleDropdown('leftDropdown')}
                 style={dropdown ? {backgroundColor: "hsla(0,0%,100%,0.1)"} : {backgroundColor: "transparent"}}
               >
-                <img src="3dots.svg" alt='' id="icon3"></img>
+                <BsThreeDotsVertical />
               </button>
-                <DropMenu id={'leftDropdown'} classname={'dropdown'} toggler={dropdown} order={() => setDropdown()}>
-                  <button onClick={() => setLeftMenu('joinGroup')}>Novo grupo</button>
-                  <button onClick={() => setLeftMenu('favoriteMessageMenu')}>Mensagens favoritas</button>
-                  <button onClick={() => setLeftMenu('config')}>Configurações</button>
-                  <button onClick={() => handleLogout()}>Desconectar</button>
-                </DropMenu>
+                <LeftDropDown 
+                  id={'leftDropdown'} 
+                  toggler={dropdown} 
+                  setDropdown={setDropdown}
+                  setLeftMenu={setLeftMenu}
+                  handleLogout={handleLogout}
+                />
             </div>
           </div>
         </div>
@@ -244,44 +239,47 @@ export default function App() {
           </div>
           
           <div className="content-holder">
-            { !filter ?
-                <>
-                  {                  
-                    contacts.map((contact, idx) => {
-                      try {
-                        return (
-                          <Card 
-                            title={contact.name} 
-                            content={user.last_message[contact.email][0]} 
-                            id={idx}
-                            date={user.last_message[contact.email][1]} 
-                            image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
-                            key={idx} 
-                            active={cardActived} 
-                            read={user.last_message[contact.email][2]}
-                            order={() => changePage(contact, idx)}
-                            isMy={!(user.last_message[contact.email][3] === contact.email)}
-                            notReaded={user.messages_not_readed[contact.email]}
-                          />
-                        )
-                      } catch (error) {}
-                    })
-                  }
-                </>
-              :  
-              <div className='filter-content-holder'>
-                <div className='filter-main'>
-                  <span>Nenhuma conversa não lida</span>
-                  <button onClick={() => setFilter(false)}>Limpar Filtro</button>
-                </div>
-                <div className='filter-bottom'>
-                  <img src='lock.svg' alt=''></img>
-                  <span>
-                    Suas mensagens pessoais são protegidas com a 
-                    <a href='https://github.com/Guilherme-ds-Garcia'> criptografia de ponta a ponta</a>
-                  </span>
-                </div>
-              </div>
+            { !filter 
+              ? contacts.map((contact, idx) => {
+                try {
+                  return (
+                    <Card 
+                      title={contact.name} 
+                      content={user.last_message[contact.email][0]} 
+                      id={idx}
+                      date={user.last_message[contact.email][1]} 
+                      image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
+                      key={idx} 
+                      active={cardActived} 
+                      read={user.last_message[contact.email][2]}
+                      order={() => changePage(contact, idx)}
+                      isMy={!(user.last_message[contact.email][3] === contact.email)}
+                      notReaded={user.messages_not_readed[contact.email]}
+                    />
+                  )
+                } catch (error) {}
+              }) 
+              : <AnimatePresence>
+                { filter && (
+                  <motion.div className='filter-content-holder'
+                    initial={{scale: 0.7, opacity: 0}}
+                    animate={{scale: 1, opacity: 1}}
+                    exit={{scale: 0.7, opacity: 0}}
+                  >
+                    <div className='filter-main'>
+                      <span>Nenhuma conversa não lida</span>
+                      <button onClick={() => setFilter(false)}>Limpar Filtro</button>
+                    </div>
+                    <div className='filter-bottom'>
+                      <img src='lock.svg' alt=''></img>
+                      <span>
+                        Suas mensagens pessoais são protegidas com a 
+                        <a href='https://github.com/Guilherme-ds-Garcia'> criptografia de ponta a ponta</a>
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+            </AnimatePresence> 
             }
           </div>
         </div>
@@ -402,7 +400,6 @@ export default function App() {
                             <Card title={contact.name} content={contact.status} 
                               id={"n"+idx}
                               image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
-                              key={idx} 
                               order={() => addConversation(contact.email)}
                             />
                           )

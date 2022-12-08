@@ -4,14 +4,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { denunceTextModal } from "../../modalSettings";
 import { collection, doc, onSnapshot, orderBy, query, updateDoc, where, getDocs } from "firebase/firestore";
 import { uploadMessage, uploadRepMessage } from "../../API";
-
+import { useData } from "../../contexts/MessageContext";
 import { useAuth } from "../../contexts/AuthContext";
+
+import DropUp from "../dropup/DropUp";
 import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
 import MessageDate from "../message-date/MessageDate";
-import DropMenu from "../dropmenu/DropMenu";
 import RightSideMenu from "../right-sidemenu/RightSideMenu";
-import FileOverlay from "../file-overlay/FileOverlay";
 import TwoOptionsModal from "../2opt-modal/TwoOptionsModal";
 import EmojiPicker from "emoji-picker-react";
 // import data from '@emoji-mart/data'
@@ -22,12 +22,10 @@ import PrevImgSection from "../prevImageSection/PrevImgSection";
 import Replied from "../replied/Replied";
 
 import {
-    BiSticker, BsFillImageFill, BsCameraFill, 
-    BsEmojiSmile,IoMdDocument,HiUser, HiArrowLeft, 
-    RiStickyNoteFill, RiCloseFill, FaArrowRight,
+    BiSticker, BsEmojiSmile, HiArrowLeft, RiCloseFill, FaArrowRight,
     FaMicrophone, AiOutlineGif, AiOutlinePaperClip
 } from '../../icons'
-import { useData } from "../../contexts/MessageContext";
+import RightDropDown from "../dropdown/right-dropdown/RightDropDown";
 
 export default function MessagePage({ currentContact, chatId, closeFunction }) { 
     const [rightmenu, setRightMenu] = useState(null);
@@ -39,9 +37,9 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
     const [filedropup, setFileDropup] = useState(false);
     const [searchbarlength, setSearchBarLength] = useState(0); // Control the toggle of mic button and send button
 
-    const [dropdown, setDropdown] = useState(null);
+    const [msgDropdown, setMsgDropdown] = useState(null);
 
-    const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
+    const toggleDropdown = (id) => id === msgDropdown ? setMsgDropdown(null) : setMsgDropdown(id);
 
     const [modalBlock, setModalBlock] = useState(false); // Modal for delete all messages
     const [modalDenunce, setModalDenunce] = useState(false); // Modal for delete all messages
@@ -183,17 +181,16 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                         </button>
                         <div className='rightDropdown-holder'>
                             <button id='rightDropdown-button' onClick={() => toggleDropdown('rightDropdown')}
-                                style={dropdown === 'rightDropdown' ? {backgroundColor: "hsla(0,0%,100%,0.1)"} : {backgroundColor: "transparent"}}
+                                style={msgDropdown === 'rightDropdown' ? {backgroundColor: "hsla(0,0%,100%,0.1)"} : {backgroundColor: "transparent"}}
                             >
                                 <img src="3dots.svg" alt='' id="icon3"></img>
                             </button>
-                            <DropMenu id={'rightDropdown'} classname={'dropdown'} toggler={dropdown} order={() => setDropdown()}>
-                                <button onClick={() => setRightMenu('friendMenu')}>Dados do contato</button>
-                                <button>Selecionar mensagens</button>
-                                <button>Silenciar notificações</button>
-                                <button>Limpar mensagens</button>
-                                <button>Sair do grupo</button>
-                            </DropMenu>
+                            <RightDropDown
+                                id={'rightDropdown'} 
+                                toggler={msgDropdown} 
+                                order={() => setMsgDropdown()}
+                                setRightMenu={setRightMenu} 
+                            />
                         </div>
                     </div>
                 </section>
@@ -209,7 +206,7 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                                             { messages.map((message, idx) => {
                                                     if (message.cardDate === date) {
                                                         return (
-                                                            <MsgType el={message} id={idx} chatId={chatId} />
+                                                            <MsgType el={message} id={idx} chatId={chatId} key={message.id}/>
                                                         )
                                                     }
                                                 })
@@ -264,55 +261,12 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                                         >
                                             <AiOutlinePaperClip id="upFile"/>
                                         </button>
-                                        { filedropup ? 
-                                            <div className="fileDropup">
-                                                <button style={{backgroundColor: '#0795dc'}}
-                                                    onClick={() => setSendContactModal(true)}
-                                                >
-                                                    <span style={{backgroundColor: '#0eabf4'}}></span>
-                                                    <HiUser/>
-                                                    <FileOverlay color={'white'} title={'Contato'}/>
-                                                </button>
-                                                <label htmlFor='i-files' style={{backgroundColor: '#5157ae'}}>
-                                                    <input id="i-files" type='file' 
-                                                        multiple='multiple'
-                                                        onInput={(e) => {
-                                                            setPreviewSec(true); 
-                                                            setDocType('doc'); 
-                                                            setDocuments(e.target.files);
-                                                        }}
-                                                    />
-                                                    <span style={{backgroundColor: '#5f66cd'}}></span>
-                                                    <IoMdDocument/>
-                                                    <FileOverlay color={'white'} title={'Documento'}/>
-                                                </label>
-                                                <button style={{backgroundColor: '#d3396d'}}>
-                                                    <span style={{backgroundColor: '#ec407a'}}></span>
-                                                    <BsCameraFill/>
-                                                    <FileOverlay color={'white'} title={'Câmera'}/>
-                                                </button>
-                                                <button style={{backgroundColor: '#0063cb'}}>
-                                                    <span style={{backgroundColor: '#0070e6'}}></span>
-                                                    <RiStickyNoteFill/>
-                                                    <FileOverlay color={'white'} title={'Figurinhas'}/>
-                                                </button>
-                                                <label htmlFor='i-images' style={{backgroundColor: '#bf59cf'}}>
-                                                    <input id="i-images" type='file' 
-                                                        accept="image/png, image/gif, image/jpeg"
-                                                        multiple='multiple'
-                                                        onInput={(e) => {
-                                                            setPreviewSec(true); 
-                                                            setDocType('img'); 
-                                                            setDocuments(e.target.files);
-                                                        }}
-                                                    />
-                                                    <span style={{backgroundColor: '#ac44cf'}}></span>
-                                                    <BsFillImageFill/>
-                                                    <FileOverlay color={'white'} title={'Fotos e Vídeos'}/>
-                                                </label>
-                                            </div>
-                                            : <></> 
-                                        }
+                                        <DropUp state={filedropup} 
+                                            setPreviewSec={setPreviewSec} 
+                                            setDocType={setDocType}
+                                            setDocuments={setDocuments}
+                                            setSendContactModal={setSendContactModal}
+                                        />
                                     </div>
                                 </div>
 

@@ -2,14 +2,12 @@
     display: flex;
     position: absolute;
     flex-direction: column;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow-y: auto;
     max-height: 100vh;
     $height: 100vh;
     right: 0;
     background-color: var(--background-left);
     font-size: 14px;
-    transition: .35s ease; 
     z-index: 10;
 
     #header {
@@ -22,6 +20,7 @@
       column-gap: 20px;
       color: white;
       background-color: var(--background-right);
+      z-index: 10;
 
       button {
           border: 0;

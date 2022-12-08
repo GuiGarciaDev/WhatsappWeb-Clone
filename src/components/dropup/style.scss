@@ -1,0 +1,76 @@
+#upFile {
+    transform: scale(1, -1) rotateZ(-90deg);
+}
+
+.fileDropup {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    row-gap: 15px;
+    bottom: 70px;
+    z-index: 10;
+    transform-origin: bottom;
+    //animation: holderY 100ms linear;
+
+    // @keyframes holderY {
+    //     0% {
+    //         transform: translateY(100px);
+    //     }
+    //     100% {
+    //         transform: translateY(0px);
+    //     }
+    // }
+
+    .test {
+        color: white;
+    }
+
+    button, label {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 15px;
+        border: 0;
+        padding: 0 !important;
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+        //animation: showButton 300ms linear;
+        cursor: pointer;
+
+        input {
+            display: none;
+        }
+
+        svg {
+            position: absolute;
+        }
+
+        // @keyframes showButton {
+        //     0% {
+        //         transform: scale(0);
+        //     }
+        //     60% {
+        //         transform: scale(1.3);
+        //     }
+        //     100% {
+        //         transform: scale(1);
+        //     }
+        // }
+
+        span {
+            align-self: flex-start;
+            border-radius: 50%;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+            width: 50px;
+            height: 50px;
+        }
+    }
+
+    button:hover, label:hover {
+        .file-overlay-holder {
+            display: flex;
+            transition: .3s linear ease; 
+        }
+    }
+}

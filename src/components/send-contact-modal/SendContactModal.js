@@ -57,7 +57,7 @@ export default function SendContactModal({ openState, contacts }) {
                     <div className='contacts-map'>
                         { contacts.map((contact, idx) => {
                             return (
-                                <label className='contact-card-modal' htmlFor={`checkbox_${idx}`}>
+                                <label className='contact-card-modal' htmlFor={`checkbox_${idx}`} key={idx}>
                                     <CustomCheckBox id={`checkbox_${idx}`} value={contact.email} onChange={handleChange}/>
                                     <img src={contact.photoUrl}></img>
                                     <div className='text-holder'>

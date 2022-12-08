@@ -74,34 +74,6 @@
             width: 18px; 
         }
     }
-
-    .image-card-dropdown {
-        flex-direction: column;
-        position: absolute;
-        transform-origin: top right;
-        top: 28px;
-        padding: 10px 0;
-        row-gap: 3px;
-        z-index: 5;
-        background-color: var(--dropdown-background);
-
-        button {
-            background-color: transparent;
-            border: 0;
-            width: 100%;
-            padding: 10px 35px 10px 20px;
-            text-align: start;
-            white-space: nowrap;
-            border-radius: 0;
-            opacity: 0.7;
-            color: white;
-            cursor: pointer;
-        }
-
-        button:hover {
-          background-color: var(--dropdown-backgrouund-hover);
-        }
-      }
 }
 
 .image-card:hover {
