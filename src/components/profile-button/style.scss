@@ -7,19 +7,20 @@
     color: white;
     cursor: pointer;
 
-    img {
-        opacity: 0.8;
-        
-    }
-
     #button-frow {
         display: flex;
         width: 100%;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
 
         .button-frow-start {
             display: flex;
+            align-items: center;
             align-items: flex-start;
             column-gap: 20px;
 
@@ -31,11 +32,6 @@
                     align-self: flex-start;
                     text-align: start;
                 }
-            }
-
-            img {
-                margin-top: 1px;
-                
             }
         }
 
@@ -51,6 +47,13 @@
     
 }
 
-[name="red"]:hover {
-    background-color: var(--card-hover);
+[name="red"] {
+    h1, svg {
+        color: red;
+        opacity: 0.7;
+    }
+
+    &:hover {
+        background-color: var(--card-hover);
+    }
 }

@@ -1,8 +1,8 @@
 import "./style.scss";
 import { useState } from "react";
 
-import { HiArrowLeft } from 'react-icons/hi';
-import { BsSearch } from 'react-icons/bs';
+import { HiArrowLeft, BsSearch } from '../../icons';
+
 import Search from "../search/Search";
 
 export default function SearchBar({placeholder, arrowId, searchId, order}) {

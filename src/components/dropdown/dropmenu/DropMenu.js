@@ -9,6 +9,26 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useData } from "../../../contexts/MessageContext";
 import { AnimatePresence, motion } from "framer-motion";
 
+const itemVariants = {
+    closed: { opacity: 0, x: 40, },
+    open: {
+        opacity: 1,
+        x: 0,
+    }
+}
+
+const mainVariants = {
+    closed: { opacity: 0, scale: 0.3 },
+    open: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+            when: 'beforeChildren',
+            staggerChildren: 0.1,
+        }
+    }
+}
+
 export default function DropMenu(props) {
     const [modalDelete, setModalDelete] = useState(false); // Modal for delete specific message
     const wrapperRef = useRef(null);
@@ -55,16 +75,17 @@ export default function DropMenu(props) {
         <AnimatePresence key={'1'}>
             { props.toggler && (
                 <motion.div className={'dropMenu'} ref={wrapperRef} id={props.id} style={styles} key={'2'}
-                    initial={{scale: 0.3, opacity: 0}}
-                    animate={{scale: 1, opacity: 1}}
+                    initial={'closed'}
+                    animate={'open'}
+                    variants={mainVariants}
                     exit={{scale: 0.3, opacity: 0}}
                 >
-                    <button onClick={() => setRepState()}>Responder</button>
-                    <button>Reagir à mensagem</button>
-                    <button>Encaminhar mensagem</button>
-                    <button>Favoritar mensagem</button>
-                    <button>Denunciar</button>
-                    <button 
+                    <motion.button variants={itemVariants} onClick={() => setRepState()}>Responder</motion.button>
+                    <motion.button variants={itemVariants}>Reagir à mensagem</motion.button>
+                    <motion.button variants={itemVariants}>Encaminhar mensagem</motion.button>
+                    <motion.button variants={itemVariants}>Favoritar mensagem</motion.button>
+                    <motion.button variants={itemVariants}>Denunciar</motion.button>
+                    <motion.button variants={itemVariants} 
                         onClick={() => {
                             if (props.owner) {
                             setModalDelete(true)
@@ -72,7 +93,7 @@ export default function DropMenu(props) {
                         }}
                     >
                         Apagar mensagem
-                    </button>
+                    </motion.button>
                 </motion.div>
             )}
 

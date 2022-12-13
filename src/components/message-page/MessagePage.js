@@ -12,7 +12,7 @@ import SearchBar from "../searchbar/SearchBar";
 import ProfileButton from "../profile-button/ProfileButton";
 import MessageDate from "../message-date/MessageDate";
 import RightSideMenu from "../right-sidemenu/RightSideMenu";
-import TwoOptionsModal from "../2opt-modal/TwoOptionsModal";
+import TwoOptionsModal from "../modals/2opt-modal/TwoOptionsModal";
 import EmojiPicker from "emoji-picker-react";
 // import data from '@emoji-mart/data'
 // import Picker from '@emoji-mart/react'
@@ -23,9 +23,10 @@ import Replied from "../replied/Replied";
 
 import {
     BiSticker, BsEmojiSmile, HiArrowLeft, RiCloseFill, FaArrowRight,
-    FaMicrophone, AiOutlineGif, AiOutlinePaperClip
+    FaMicrophone, AiOutlineGif, AiOutlinePaperClip, BsThreeDotsVertical, BsSearch
 } from '../../icons'
 import RightDropDown from "../dropdown/right-dropdown/RightDropDown";
+import { toastEmiterError } from "../../toastifyemiter";
 
 export default function MessagePage({ currentContact, chatId, closeFunction }) { 
     const [rightmenu, setRightMenu] = useState(null);
@@ -38,7 +39,6 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
     const [searchbarlength, setSearchBarLength] = useState(0); // Control the toggle of mic button and send button
 
     const [msgDropdown, setMsgDropdown] = useState(null);
-
     const toggleDropdown = (id) => id === msgDropdown ? setMsgDropdown(null) : setMsgDropdown(id);
 
     const [modalBlock, setModalBlock] = useState(false); // Modal for delete all messages
@@ -177,19 +177,22 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
 
                     <div className="block-end">
                         <button onClick={() => setRightMenu('searchMessage')}>
-                            <img id="srch"src="search-icon.svg" alt=""></img>
+                            <BsSearch/>
                         </button>
                         <div className='rightDropdown-holder'>
                             <button id='rightDropdown-button' onClick={() => toggleDropdown('rightDropdown')}
                                 style={msgDropdown === 'rightDropdown' ? {backgroundColor: "hsla(0,0%,100%,0.1)"} : {backgroundColor: "transparent"}}
                             >
-                                <img src="3dots.svg" alt='' id="icon3"></img>
+                                <BsThreeDotsVertical />
                             </button>
                             <RightDropDown
                                 id={'rightDropdown'} 
                                 toggler={msgDropdown} 
                                 order={() => setMsgDropdown()}
                                 setRightMenu={setRightMenu} 
+                                setModalBlock={setModalBlock}
+                                setModalDenunce={setModalDenunce}
+                                setModalDeleteConversation={setModalDeleteConversation}
                             />
                         </div>
                     </div>
@@ -315,26 +318,30 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                         </button>
                     </div>
                     <div className="profile-button-holder">
-                        <ProfileButton icon="star.svg" title="Mensagens Favoritas"
-                            lasticon="right-harrow.svg"
+                        <ProfileButton icon={"star"} title="Mensagens Favoritas"
+                            lasticon={true}
+                            funct={() => toastEmiterError('undefined')}
                         />
-                        <ProfileButton icon="bell.svg" title="Silenciar Notificações"
+                        <ProfileButton icon="bell" title="Silenciar Notificações"
+                            funct={() => toastEmiterError('undefined')}
                             
                         />
-                        <ProfileButton icon="tempmess.svg" title="Mensagens Temporárias"
-                            subtitle="Desativadas" lasticon="right-harrow.svg"
+                        <ProfileButton icon="tempmess" title="Mensagens Temporárias"
+                            subtitle="Desativadas" lasticon={true}
+                            funct={() => toastEmiterError('undefined')}
                         />
-                        <ProfileButton icon="keylock.svg" title="Criptografia"
+                        <ProfileButton icon="keylock" title="Criptografia"
                             subtitle="As mensagens são protegidas com a criptografia de ponta a ponta.
                             Clique para confirmar"
+                            funct={() => toastEmiterError('undefined')}
                         />
-                        <ProfileButton icon="denied.svg" title={"Bloquear " + currentContact.name} red={true} name={'red'}
+                        <ProfileButton icon="denied" title={"Bloquear " + currentContact.name} red={true} name={'red'}
                             funct={() => setModalBlock(true)}
                         />
-                        <ProfileButton icon="dislike.svg" title={"Denunciar " + currentContact.name} red={true} name={"red"}
+                        <ProfileButton icon="dislike" title={"Denunciar " + currentContact.name} red={true} name={"red"}
                             funct={() => setModalDenunce(true)}
                         />
-                        <ProfileButton icon="trash.svg" title={"Apagar Conversa"} red={true} name={'red'}
+                        <ProfileButton icon="trash" title={"Apagar Conversa"} red={true} name={'red'}
                             funct={() => setModalDeleteConversation(true)}
                         />
                     </div>

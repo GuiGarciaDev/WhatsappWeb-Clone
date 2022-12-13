@@ -1,13 +1,13 @@
 import './style.scss'
 import Modal from 'react-modal';
-import SearchBar from '../searchbar/SearchBar';
-import { MdClose, IoMdSend } from '../../icons'; 
-import CustomCheckBox from '../custom-checkbox/CustomCheckBox';
+import SearchBar from '../../searchbar/SearchBar';
+import { MdClose, IoMdSend } from '../../../icons'; 
+import CustomCheckBox from '../../custom-checkbox/CustomCheckBox';
 import { useState } from 'react';
-import { useData } from '../../contexts/MessageContext';
-import { sendContacts } from '../../API';
-import { sendContactModalStyle } from '../../modalSettings'
-import { useAuth } from '../../contexts/AuthContext';
+import { useData } from '../../../contexts/MessageContext';
+import { sendContacts } from '../../../API';
+import { sendContactModalStyle } from '../../../modalSettings'
+import { useAuth } from '../../../contexts/AuthContext';
 
 export default function SendContactModal({ openState, contacts }) {
     const { currentUser } = useAuth()

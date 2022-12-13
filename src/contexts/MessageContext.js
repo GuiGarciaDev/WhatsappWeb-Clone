@@ -9,13 +9,24 @@ export function useData() {
 }
 
 export function DataProvider({ children }) {
-    const [user, setUser] = useState([]);
-    const [contact, setContact] = useState([]);
-    const [sendContactModal, setSendContactModal] = useState(false); // Open Send Contact Modal in App.js
+    const [messagePage, setMessagePage] = useState(false) // State of <MessagePage/> component in App.js (chat page)
+    const [chatId, setChatId] = useState('')              // Parameter of <MessagePage/> component in App.js (id of chat)
+    const [cardActived, setCardActived] = useState('');   // Parameter of <MessagePage/> component in App.js (change bg of card in leftColumn)
+    const [contact, setContact] = useState([]);           // Parameter of <MessagePage/> component in App.js (set contact data to chat page)
+
+
+    const [user, setUser] = useState([]) // CurrentUser data
     const [repMessage, setRepMessage] = useState([false, {}]);
     const [error, setError] = useState();
 
+    // Modals
+
+    const [sendContactModal, setSendContactModal] = useState(false); // Open Send Contact Modal in App.js
+
     const value = {
+        messagePage, setMessagePage,
+        cardActived, setCardActived,
+        chatId, setChatId,
         user, setUser,
         contact, setContact,
         repMessage, setRepMessage,

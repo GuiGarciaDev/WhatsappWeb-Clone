@@ -2,6 +2,7 @@ import React from 'react';
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { DataProvider } from './contexts/MessageContext';
@@ -28,6 +29,7 @@ root.render(
                 element={
                   <PrivateRoute>
                     <App />
+                    <ToastContainer/>
                   </PrivateRoute>
                 }
               />

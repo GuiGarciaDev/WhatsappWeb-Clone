@@ -8,7 +8,7 @@ import LeftSideMenu from '../components/left-sidemenu/LeftSideMenu';
 import DividerLetter from '../components/divider-letter/DividerLetter';
 import ConfigCard from '../components/config-card/ConfigCard';
 import NewContactModal from '../components/new-contact-modal/NewContactModal';
-import SendContactModal from '../components/send-contact-modal/SendContactModal';
+import SendContactModal from '../components/modals/send-contact-modal/SendContactModal';
 import LeftDropDown from '../components/dropdown/left-dropdown/LeftDropDown';
 
 import { useState, useEffect } from 'react';
@@ -21,32 +21,30 @@ import { collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where }
 import { generateId, getContactWithId } from '../API';
 import { getFullDateWithSpace } from '../date';
 import { AnimatePresence, motion } from 'framer-motion';
-
-import { AiOutlineUserAdd, AiFillBell, AiOutlineCheck } from 'react-icons/ai';
-import { BiShieldQuarter } from 'react-icons/bi';
-import { BsFilter, BsThreeDotsVertical, BsChatLeftTextFill } from 'react-icons/bs';
-import { HiDocumentText } from 'react-icons/hi'; 
-import { IoMdHelpCircle } from 'react-icons/io'; 
-import { MdGroup, MdLock, MdBrightnessMedium, MdModeEdit } from 'react-icons/md'; 
-import { RiImageEditFill } from 'react-icons/ri'; 
-import { SiStatuspage } from 'react-icons/si'; 
-import { VscSymbolKey } from 'react-icons/vsc'; 
+import { toastEmiter, toastEmiterError } from '../toastifyemiter';
+import {
+  AiOutlineUserAdd, AiFillBell, AiOutlineCheck,
+  BiShieldQuarter, BsFilter, BsThreeDotsVertical, BsChatLeftTextFill,
+  HiDocumentText, IoMdHelpCircle, MdGroup, MdLock, MdBrightnessMedium, 
+  MdModeEdit, RiImageEditFill, SiStatuspage, VscSymbolKey
+} from '../icons'
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
 export default function App() {
   // Front end
 
-  const [messagePage, setMessagePage] = useState(false); // Controls the right column -> Talk page
-  const [leftmenu, setLeftMenu] = useState(null);        // Controls the state of left menus
+  const { 
+    messagePage, setMessagePage,
+    cardActived, setCardActived, 
+    sendContactModal, chatId, setChatId
+  } = useData()
 
+  const [leftmenu, setLeftMenu] = useState(null);        // Controls the state of left menus
   const [editName, setEditName] = useState(false);
-  const [cardActived, setCardActived] = useState('');
   const [editEmail, setEditEmail] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [filter, setFilter] = useState(false);
-
-  const { sendContactModal } = useData()
 
   const [newContactModal, setNewContactModal] = useState(false) // Open / close modal for add new contact
   
@@ -109,9 +107,6 @@ export default function App() {
   }, [])
 
   // Back end
-
-  const [chatId, setChatId] = useState('')
-
   const [error, setError] = useState('')
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
@@ -193,13 +188,12 @@ export default function App() {
   return (
     <div id="page">
       <div className={"left-column"} style={messagePage && windowSize.innerWidth <= 630 ? {width: '0'} : {}}>
-
         <div className="left-up">
           <button onClick={() => setLeftMenu('perfilMenu')}>
             <img src={user_image} alt='' className="user-img"></img>
           </button>
           <div className='up-icon-holder'>
-            <button>
+            <button onClick={() => {toastEmiter('Not working'); console.log('a');}}>
               <SiStatuspage />
             </button>
             <button onClick={() => setLeftMenu('newMessageMenu')}>
@@ -285,17 +279,26 @@ export default function App() {
         </div>
 
         <LeftSideMenu id={'perfilMenu'} title={'Perfil'} toggler={leftmenu} closeFunction={() => setLeftMenu()}>
-          <div id="inputImg-holder"> 
-            <img id="preview" src={user_image} alt=""></img>
-            <input
-              type="file"
-              onChange={(e) => previewImage(e.target.files[0])}
-              accept="/image/*"
-              id="file"
-              autoComplete='off'
-            />
-            <label htmlFor="file"></label>
-          </div>
+          <AnimatePresence>
+            {leftmenu === 'perfilMenu' && (
+              <motion.div id="inputImg-holder"
+                initial={{scale: 0}}
+                animate={{scale: 1}}
+                exit={{scale: 0}}
+                transition={{duration: 0.05}}
+              > 
+                <img id="preview" src={user_image} alt=""/>
+                <input
+                  type="file"
+                  onChange={(e) => previewImage(e.target.files[0])}
+                  accept="/image/*"
+                  id="file"
+                  autoComplete='off'
+                />
+                <label htmlFor="file"></label>
+            </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className='sub'>
             <span>Seu nome</span>
@@ -446,7 +449,7 @@ export default function App() {
                 return (
                 <>
                   {
-                     <DividerLetter letter={letter} key={idx}/>
+                    <DividerLetter letter={letter} key={idx}/>
                   }
                   {
                     contacts.map((contact, idx) => {
@@ -477,28 +480,28 @@ export default function App() {
               <span>{user.status}</span>
             </div>
           </button>
-          <ConfigCard title={'Notificações'}>
+          <ConfigCard title={'Notificações'} action={toastEmiterError}>
             <AiFillBell/>
           </ConfigCard>
-          <ConfigCard title={'Privacidade'}>
+          <ConfigCard title={'Privacidade'} action={toastEmiterError}>
             <MdLock/>
           </ConfigCard>
-          <ConfigCard title={'Segurança'}>
+          <ConfigCard title={'Segurança'} action={toastEmiterError}>
             <BiShieldQuarter/>
           </ConfigCard>
-          <ConfigCard title={'Tema'}>
+          <ConfigCard title={'Tema'} action={toastEmiterError}>
             <MdBrightnessMedium/>
           </ConfigCard>
-          <ConfigCard title={'Papel de parede da conversa'}>
+          <ConfigCard title={'Papel de parede da conversa'} action={toastEmiterError}>
             <RiImageEditFill/>
           </ConfigCard>
-          <ConfigCard title={'Solicitar dados da conta'}>
+          <ConfigCard title={'Solicitar dados da conta'} action={toastEmiterError}>
             <HiDocumentText/>
           </ConfigCard>
-          <ConfigCard title={'Atalhos do teclado'}>
+          <ConfigCard title={'Atalhos do teclado'} action={toastEmiterError}>
             <VscSymbolKey/>
           </ConfigCard>
-          <ConfigCard title={'Ajuda'}>
+          <ConfigCard title={'Ajuda'} action={toastEmiterError}>
             <IoMdHelpCircle/>
           </ConfigCard>
         </LeftSideMenu>

@@ -1,8 +1,7 @@
 import './style.scss';
-
-import Modal from 'react-modal';
-import { customStyles } from '../../modalSettings';
-import CustomCheckBox from '../custom-checkbox/CustomCheckBox';
+import Modal from 'react-modal'
+import CustomCheckBox from '../../custom-checkbox/CustomCheckBox';
+import { customStyles } from '../../../modalSettings';
 
 export default function TwoOptionsModal(props) {
 
@@ -15,8 +14,9 @@ export default function TwoOptionsModal(props) {
             style={customStyles}
             contentLabel="Example Modal"
             shouldCloseOnOverlayClick={false}
-            id="twoOptionModal"
+            id={'twoOptModal'}
             appElement={document.getElementById('root')}
+            closeTimeoutMS={150}
         >
             <div className="deleteModalConversation-content">
                 <h2>{props.title}</h2>

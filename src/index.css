@@ -70,3 +70,22 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--down-border); 
 }
+
+
+/* Modal Transitions */
+
+.ReactModal__Overlay {
+  opacity: .5;
+  transform: scale(0);
+  transition: 0.15s ease-out;
+}
+
+.ReactModal__Overlay--after-open{
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ReactModal__Overlay--before-close{
+  opacity: 0;
+  transform: scale(0);
+}

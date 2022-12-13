@@ -2,6 +2,26 @@ import './style.scss'
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useEffect } from "react";
 
+const itemVariants = {
+    closed: { opacity: 0, x: 40, },
+    open: {
+        opacity: 1,
+        x: 0,
+    }
+}
+
+const mainVariants = {
+    closed: { opacity: 0, scale: 0.3 },
+    open: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+            when: 'beforeChildren',
+            staggerChildren: 0.1,
+        }
+    }
+}
+
 export default function LeftDropDown(props) {
     const wrapperRef = useRef(null);
 
@@ -29,22 +49,23 @@ export default function LeftDropDown(props) {
         <AnimatePresence>
             { props.toggler && (
                 <motion.div className={'leftDropDown'} ref={wrapperRef} id={props.id}
-                    initial={{scale: 0.3, opacity: 0}}
-                    animate={{scale: 1, opacity: 1}}
+                    initial={'closed'}
+                    animate={'open'}
+                    variants={mainVariants}
                     exit={{scale: 0.3, opacity: 0}}
                 >
-                    <button onClick={() => {props.setLeftMenu('joinGroup'); props.setDropdown(false)}}>
+                    <motion.button variants={itemVariants} onClick={() => {props.setLeftMenu('joinGroup'); props.setDropdown(false)}}>
                         Novo grupo
-                    </button>
-                    <button onClick={() => {props.setLeftMenu('favoriteMessageMenu'); props.setDropdown(false)}}>
+                    </motion.button>
+                    <motion.button variants={itemVariants} onClick={() => {props.setLeftMenu('favoriteMessageMenu'); props.setDropdown(false)}}>
                         Mensagens favoritas
-                    </button>
-                    <button onClick={() => {props.setLeftMenu('config'); props.setDropdown(false)}}>
+                    </motion.button>
+                    <motion.button variants={itemVariants} onClick={() => {props.setLeftMenu('config'); props.setDropdown(false)}}>
                         Configurações
-                    </button>
-                    <button onClick={() => {props.handleLogout(); props.setDropdown(false)}}>
+                    </motion.button>
+                    <motion.button variants={itemVariants} onClick={() => {props.handleLogout(); props.setDropdown(false)}}>
                         Desconectar
-                    </button>
+                    </motion.button>
                 </motion.div>
             )}
         </AnimatePresence>
