@@ -46,7 +46,7 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
     const [modalDeleteConversation, setModalDeleteConversation] = useState(false); // Modal for delete all messages
 
     const { currentUser } = useAuth()
-    const { repMessage, setRepMessage, setSendContactModal } = useData()
+    const { repMessage, setRepMessage, setSendContactModal, setImage, setImageSlider } = useData()
     const chatboxInput = useRef();
 
     //const [contact, setContact] = useState();
@@ -300,7 +300,7 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
             <RightSideMenu id={'friendMenu'} title={'Dados do Contato'} toggler={rightmenu} closeFunction={() => setRightMenu()}>
                 <section id="friend-Mid">
                     <div className="profile-image-name">
-                        <img src={user_image} alt=""></img>
+                        <button onClick={() => {setImageSlider(true); setImage(user_image)}}><img src={user_image} alt=""></img></button>
                         <h2>{currentContact.name}</h2>
                         <span>{currentContact.email}</span>
                     </div>

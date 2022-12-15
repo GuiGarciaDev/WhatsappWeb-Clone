@@ -1,6 +1,7 @@
 import React from 'react'
 import { useContext } from 'react'
 import { useState } from 'react';
+import { generateId, getContactWithId } from '../API';
 
 const DataContext = React.createContext(); // Change it for a better name (GlobalContext is a good idea?)
 
@@ -15,13 +16,22 @@ export function DataProvider({ children }) {
     const [contact, setContact] = useState([]);           // Parameter of <MessagePage/> component in App.js (set contact data to chat page)
 
 
+    const [imageSlider, setImageSlider] = useState(false); // State for ImageSlider component (true || false)
+    const [image, setImage] = useState(null); // Pass the image for slider
+
     const [user, setUser] = useState([]) // CurrentUser data
     const [repMessage, setRepMessage] = useState([false, {}]);
     const [error, setError] = useState();
 
-    // Modals
-
     const [sendContactModal, setSendContactModal] = useState(false); // Open Send Contact Modal in App.js
+
+    async function openConversation(id) {
+        const contact = await getContactWithId(id)
+        setContact(contact)
+        setMessagePage(true);
+        setChatId(generateId(user.email, contact.email))
+        //setLeftMenu(false) // close newMessageMenu when open new conversation 
+    } 
 
     const value = {
         messagePage, setMessagePage,
@@ -32,6 +42,9 @@ export function DataProvider({ children }) {
         repMessage, setRepMessage,
         error, setError,
         sendContactModal, setSendContactModal,
+        imageSlider, setImageSlider,
+        image, setImage,
+        openConversation,
     }
     
     return (

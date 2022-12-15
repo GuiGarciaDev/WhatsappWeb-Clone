@@ -28,6 +28,8 @@ import {
   HiDocumentText, IoMdHelpCircle, MdGroup, MdLock, MdBrightnessMedium, 
   MdModeEdit, RiImageEditFill, SiStatuspage, VscSymbolKey
 } from '../icons'
+import Contact from '../components/contact-card/Contact';
+import ImageSlider from '../components/image-slider/ImageSlider';
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
@@ -54,21 +56,6 @@ export default function App() {
   const [dropdown, setDropdown] = useState(null);
   
   const toggleDropdown = (id) => id === dropdown ? setDropdown(null) : setDropdown(id);
-
-  function changePage(contact, idx) { // Search for better way to do this...
-    setContact(contact)
-    setMessagePage(true)
-    setChatId(generateId(currentUser.email, contact.email))
-    setCardActived(idx)
-  }
-
-  function addConversation(email) {
-    const contact = getContactWithId(email)
-    setContact(contact)
-    setMessagePage(true);
-    setChatId(generateId(currentUser.email, contact.email))
-    setLeftMenu(false)
-  }
 
   function previewImage(file) { // handleUpload()
     const storageRef = ref(storage, `/user-image/${file.name}`)
@@ -111,7 +98,7 @@ export default function App() {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
   
-  const { user, setUser, contact, setContact } = useData()
+  const { user, setUser, contact, openConversation } = useData()
   const [contacts, setContacts] = useState([]) // users/user => other users tha you have added
 
   const [email, setEmail] = useState('')
@@ -193,7 +180,7 @@ export default function App() {
             <img src={user_image} alt='' className="user-img"></img>
           </button>
           <div className='up-icon-holder'>
-            <button onClick={() => {toastEmiter('Not working'); console.log('a');}}>
+            <button onClick={() => toastEmiter('Not working')}>
               <SiStatuspage />
             </button>
             <button onClick={() => setLeftMenu('newMessageMenu')}>
@@ -221,7 +208,7 @@ export default function App() {
             <div className="searchbar-holder">
               <SearchBar placeholder={"Pesquisar ou começar uma nova conversa"}
                 arrowId="leftC-arrow" searchId="leftC-search"
-                order={changePage}
+                order={openConversation}
               />
             </div>
             <button id='filterButton' 
@@ -239,6 +226,7 @@ export default function App() {
                   return (
                     <Card 
                       title={contact.name} 
+                      contactEmail={contact.email}
                       content={user.last_message[contact.email][0]} 
                       id={idx}
                       date={user.last_message[contact.email][1]} 
@@ -246,7 +234,7 @@ export default function App() {
                       key={idx} 
                       active={cardActived} 
                       read={user.last_message[contact.email][2]}
-                      order={() => changePage(contact, idx)}
+                      order={() => openConversation(contact.id)}
                       isMy={!(user.last_message[contact.email][3] === contact.email)}
                       notReaded={user.messages_not_readed[contact.email]}
                     />
@@ -400,10 +388,12 @@ export default function App() {
                       contacts.map((contact, idx) => {
                         if (contact.name[0] === letter) {
                           return (
-                            <Card title={contact.name} content={contact.status} 
+                            <Contact
+                              title={contact.name} 
+                              content={contact.status} 
                               id={"n"+idx}
                               image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
-                              order={() => addConversation(contact.email)}
+                              order={() => openConversation(contact.id)}
                             />
                           )
                         }
@@ -527,6 +517,8 @@ export default function App() {
       </NewContactModal>
 
       <SendContactModal openState={sendContactModal} contacts={contacts}/>
+
+      <ImageSlider />
     </div>
   )
 }

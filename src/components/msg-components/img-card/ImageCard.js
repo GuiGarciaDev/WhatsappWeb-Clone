@@ -7,11 +7,12 @@ import DropMenu from '../../dropdown/dropmenu/DropMenu';
 
 import { BsCheckAll } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
+import { useData } from '../../../contexts/MessageContext';
 
 export default function ImageCard({ el, id, chatId }) { 
     const lastMessageRef = useRef()
     const { currentUser } = useAuth()
-    const [modalDelete, setModalDelete] = useState(false); // Modal for delete specific message
+    const { setImageSlider, setImage } = useData()
     const [dropdown, setDropdown] = useState(false);
     const dropdownId = 'dd' + id;
 
@@ -26,10 +27,10 @@ export default function ImageCard({ el, id, chatId }) {
             : {alignSelf: 'flex-start', borderRadius: '0 10px 10px 10px'}}
         ref={lastMessageRef}
         >
-            <div className='image-card-content'>
+            <button className='image-card-content' onClick={() => {setImageSlider(true); setImage(el.photoUrl)}}>
                 <img src={el.photoUrl ?? el.photoUrl}></img>
                 <label style={el.autor === currentUser.email ? {right: '-12px'} : {left: '-12px', transform: 'scale(-1, 1)'}}/>
-            </div>
+            </button>
             <div className='time'>
                 <span id='image-card-time' >{el.time}</span>
                 {

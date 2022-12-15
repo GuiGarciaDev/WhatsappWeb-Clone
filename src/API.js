@@ -3,7 +3,6 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { getDate, getFullDate, getTime } from "./date";
 import { firedb as db, storage} from "./firebase";
 
-
 export function generateId (userID, friendID) {
     const newChatId = userID > friendID 
       ? userID + friendID
@@ -81,8 +80,6 @@ export async function sendContacts( userEmail, contact, contacts ) { // Send con
                     [userEmail]: (contact.messages_not_readed[userEmail] + 1)
                 }
             })
-            // updateLastMessageIn(userEmail, contact.email, docRef)
-            // updateLastMessageIn(userEmail, contact.email, docRef)
         })
     }
 }
@@ -155,8 +152,6 @@ export async function uploadRepMessage( userEmail, contact, value, repId ) { // 
                 [userEmail]: (contact.messages_not_readed[userEmail] + 1)
             }
         })
-        updateLastMessageIn(userEmail, contact.email, docRef)
-        updateLastMessageIn(userEmail, contact.email, docRef)
     })
     
 }
@@ -190,34 +185,43 @@ export async function uploadMessage( userEmail, contact, value ) { // Send messa
                 [userEmail]: (contact.messages_not_readed[userEmail] + 1)
             }
         })
-        updateLastMessageIn(userEmail, contact.email, docRef)
-        updateLastMessageIn(contact.email, userEmail, docRef)
     })
     
 }
 
-export async function updateLastMessageIn(userEmail, friendEmail, docRef) {
-    // Params:
+// export async function updateLastMessageIn(userEmail, friendEmail, docRef) {
+//     // Params:
 
-    const ref = await getDoc(doc(db, 'users', userEmail))
-    const userData = ref.data()
-    const lastMessage = await getDoc(docRef)
-    const lastMessageData = lastMessage.data()
+//     const ref = await getDoc(doc(db, 'users', userEmail))
+//     const userData = ref.data()
+//     const lastMessage = await getDoc(docRef)
+//     const lastMessageData = lastMessage.data()
 
-    try {
-        await updateDoc(doc(db, 'users', userEmail), {
-            "last_message": {
-                ...userData.last_message,
-                [friendEmail]: [
-                    lastMessageData.content, 
-                    lastMessageData.cardDate, 
-                    lastMessageData.read, 
-                    lastMessageData.autor,
-                ]
-            }
-        })
-    } catch (error) {console.log(error);}
-}
+//     try {
+//         switch (lastMessageData.type) {
+//             case 'text':
+//                 await updateDoc(doc(db, 'users', userEmail), {
+//                     "last_message": {
+//                         ...userData.last_message,
+//                         [friendEmail]: [
+//                             lastMessageData.content, 
+//                             lastMessageData.cardDate, 
+//                             lastMessageData.read, 
+//                             lastMessageData.autor,
+//                         ]
+//                     }
+//                 })
+//                 break;
+//             case 'img':
+                
+//                 break;
+        
+//             default:
+//                 break;
+//         }
+        
+//     } catch (error) {console.log(error);}
+// }
 
 export function deleteMessage ( messageId, chatId ) {
     const messageRef = doc(db, "chat", chatId, 'messages', messageId)

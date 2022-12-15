@@ -24,37 +24,31 @@
         border-top: 1px solid var(--border);
     
         .mid {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          max-width: 230px;
-          height: 70px;
-          text-align: start;
-
-          h1 {
-            color: var(--name);
-            font-size: 16px;
-            margin: 2px 0; 
-          }
-
-          span {
             display: flex;
-            align-items: center;
-            font-size: 14px;
-            color: var(--text-secondary);
+            flex-direction: column;
+            justify-content: center;
+            max-width: 230px;
+            height: 70px;
+            text-align: start;
 
-            svg {
-              margin-right: 8px;
+            h1 {
+                color: var(--name);
+                font-size: 16px;
+                margin: 2px 0; 
             }
-          }
 
-          h1, span {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            width: 100%;
-            display: block;
-            overflow: hidden;
-          }
+            span {
+                font-size: 14px;
+                color: var(--text-secondary);
+            }
+
+            h1, span {
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                width: 100%;
+                display: block;
+                overflow: hidden;
+            }
         }
 
         @media (max-width: 880px) {

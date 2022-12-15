@@ -8,14 +8,16 @@ import DropMenu from '../../dropdown/dropmenu/DropMenu';
 import { BsCheckAll } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
 import { getContactWithId } from '../../../API';
+import { useData } from '../../../contexts/MessageContext';
 
 export default function ContactCard({ el, id, chatId }) { 
     const lastMessageRef = useRef()
+    const { openConversation } = useData()
     const { currentUser } = useAuth()
     const [data, setData] = useState([]);
     const [dropdown, setDropdown] = useState(false);
     const dropdownId = 'dd' + id;
-
+    
     useEffect(() => {
         lastMessageRef.current?.scrollIntoView({ behavior: "smooth" })
 
@@ -53,7 +55,7 @@ export default function ContactCard({ el, id, chatId }) {
             </div>
 
             <div className='contact-buttons'>
-                <button>Conversar</button>
+                <button onClick={() => openConversation(el.contactId)}>Conversar</button>
             </div>
             
             {

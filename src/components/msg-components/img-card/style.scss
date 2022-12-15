@@ -23,6 +23,7 @@
         align-items: center;
         min-width: 100px;
         min-height: 100px;
+        cursor: pointer;
 
         img {
             max-height: 600px;
@@ -77,7 +78,6 @@
 }
 
 .image-card:hover {
-    cursor: pointer;
     .image-card-dropbutton {
         display: flex;
         animation: foward .3s;

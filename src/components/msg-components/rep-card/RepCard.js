@@ -5,25 +5,38 @@ import { useAuth } from '../../../contexts/AuthContext';
 
 import DropMenu from '../../dropdown/dropmenu/DropMenu';
 
-import { AiFillCamera, BsCheckAll, IoIosArrowDown, HiDocument } from '../../../icons'
-import { getRepliedMsg } from '../../../API';
+import { AiFillCamera, BsCheckAll, IoIosArrowDown, HiDocument, HiUser } from '../../../icons'
+import { getContactWithId, getRepliedMsg } from '../../../API';
 
 export default function RepCard({ el, id, chatId }) { 
     const lastMessageRef = useRef()
     const { currentUser } = useAuth()
     const [dropdown, setDropdown] = useState(false);
     const [repliedMessage, setRepliedMessage] = useState([]);
+    const [repliedUser, setRepliedUser] = useState([]);
     const dropdownId = 'dd' + id;
 
-    useEffect(() => {
-        async function setRepState() {
-            const repMessage = await getRepliedMsg(el.repId, chatId)
-            setRepliedMessage(repMessage)
+    async function setRepState() {
+        const repMessage = await getRepliedMsg(el.repId, chatId)
+        setRepliedMessage(repMessage)
+
+        if (repliedMessage.type === "contact") {
+            const repUser = await getContactWithId(repMessage.contactId)
+            setRepliedUser(repUser)
         }
-    
+    }
+    useEffect(() => {
+        setRepState()
+    }, [repliedMessage])
+
+    useEffect(() => {
         setRepState()
         lastMessageRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [])
+
+    function scrollToRepMesg( id ) {
+        document.getElementById(id).scrollIntoView({behavior: 'smooth', block: 'center'})
+    }
 
     return (
         <div id={el.id} className="rep-card" key={id}
@@ -32,23 +45,29 @@ export default function RepCard({ el, id, chatId }) {
             : {alignSelf: 'flex-start', borderRadius: '0 10px 10px 10px'}} 
         ref={lastMessageRef}
         >
-            <div className='rep-message'>
-                <span></span>
-                <div className='autorContent'>
-                    <p className='autor'>{repliedMessage.autor  === currentUser.email ? 'Você' : repliedMessage.autor}</p>
-                    <div>
-                    { repliedMessage.type === 'img'
-                        ? <p><AiFillCamera/>Foto</p>
-                        : (repliedMessage.type === ('pdf') || repliedMessage.type === 'doc')
-                            ? <div className='file-description'><HiDocument/>{`${repliedMessage.fileName}`}</div>
-                            : <p>{repliedMessage.content}</p>
-                    }
+            <div className='rep-message' onClick={() => scrollToRepMesg(el.repId)}>
+                <span/>
+                <div className='divider'>
+                    <div className='autorContent'>
+                        <p className='autor'>{repliedMessage.autor  === currentUser.email ? 'Você' : repliedMessage.autor}</p>
+                        <div>
+                        { repliedMessage.type === 'img'
+                            ? <p><AiFillCamera/>Foto</p>
+                            : (repliedMessage.type === 'pdf' || repliedMessage.type === 'doc')
+                                ? <div className='file-description'><HiDocument/>{`${repliedMessage.fileName}`}</div>
+                                : repliedMessage.type === 'contact'
+                                    ? <div className='contact-description'><HiUser/> {repliedUser.name}</div>
+                                    : <p>{repliedMessage.content}</p>
+                        }
+                        </div>
                     </div>
+                    { repliedMessage.type === 'img' 
+                        ? <img src={repliedMessage.photoUrl} alt=''></img>
+                        : repliedMessage.type === 'contact'
+                            ? <img src={repliedUser.photoUrl} alt=''></img> 
+                            : <></>
+                    }
                 </div>
-                { repliedMessage.type === 'img' 
-                    ? <img src={repliedMessage.photoUrl}></img>
-                    : <></>
-                }
             </div>
 
             <div className='message-card-content'>
