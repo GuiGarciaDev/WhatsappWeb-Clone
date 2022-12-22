@@ -2,29 +2,37 @@ import './style.scss'
 import FileOverlay from '../file-overlay/FileOverlay';
 import { BsFillImageFill, BsCameraFill, IoMdDocument, HiUser, RiStickyNoteFill } from '../../icons'
 import { AnimatePresence, motion } from 'framer-motion'
+import { toastEmiterError } from '../../toastifyemiter';
  
-const sideVariants = {
-    closed: {
-        y: 200,
+const itemVariants = {
+    closed: { opacity: 0, y: 30, },
+    open: {
+        opacity: 1,
+        y: 0,
+    }
+}
+
+const dropUpVariants = {
+    closed: { 
         opacity: 0,
+        y: 80,
         transition: {
-            staggerChildren: 0.1,
-            staggerDirection: 1,
-            duration: .3
-        }
+            when: 'afterChildren',
+        } 
     },
     open: {
-        y: 0,
         opacity: 1,
-        transition: { 
-            //staggerChildren: 0.1,
+        y: 0,
+        transition: {
+            //when: 'beforeChildren',
+            staggerChildren: 0.07,
             staggerDirection: -1,
-            duration: .3
         }
     }
-};
+}
 
 export default function DropUp(props) {  
+
     return (
         <AnimatePresence> 
             { props.state && (
@@ -32,23 +40,26 @@ export default function DropUp(props) {
                     initial="closed"
                     animate="open"
                     exit="closed"
-                    variants={sideVariants}
+                    variants={dropUpVariants}
                 >
-                    <motion.button style={{backgroundColor: '#0795dc'}}
-                        onClick={() => props.setSendContactModal(true)}
+                    <motion.button 
+                        style={{backgroundColor: '#0795dc'}} 
+                        variants={itemVariants}
+                        onClick={() => {props.setSendContactModal(true); props.setState(false)}}
                     >
                         <span style={{backgroundColor: '#0eabf4'}}></span>
                         <HiUser/>
                         <FileOverlay color={'white'} title={'Contato'}/>
                     </motion.button>
 
-                    <motion.label htmlFor='i-files' style={{backgroundColor: '#5157ae'}}>
+                    <motion.label htmlFor='i-files' style={{backgroundColor: '#5157ae'}} variants={itemVariants}> 
                         <input id="i-files" type='file' 
                             multiple='multiple'
                             onInput={(e) => {
                                 props.setPreviewSec(true); 
                                 props.setDocType('doc'); 
                                 props.setDocuments(e.target.files);
+                                props.setState(false)
                             }}
                         />
                         <span style={{backgroundColor: '#5f66cd'}}></span>
@@ -56,19 +67,23 @@ export default function DropUp(props) {
                         <FileOverlay color={'white'} title={'Documento'}/>
                     </motion.label>
 
-                    <motion.button style={{backgroundColor: '#d3396d'}}>
+                    <motion.button style={{backgroundColor: '#d3396d'}} variants={itemVariants}
+                        onClick={() => toastEmiterError('Undefined')}
+                    >
                         <span style={{backgroundColor: '#ec407a'}}></span>
                         <BsCameraFill/>
                         <FileOverlay color={'white'} title={'Câmera'}/>
                     </motion.button>
 
-                    <motion.button style={{backgroundColor: '#0063cb'}}>
+                    <motion.button style={{backgroundColor: '#0063cb'}} variants={itemVariants}
+                         onClick={() => toastEmiterError('Undefined')}
+                    >
                         <span style={{backgroundColor: '#0070e6'}}></span>
                         <RiStickyNoteFill/>
                         <FileOverlay color={'white'} title={'Figurinhas'}/>
                     </motion.button>
 
-                    <motion.label htmlFor='i-images' style={{backgroundColor: '#bf59cf'}}>
+                    <motion.label htmlFor='i-images' style={{backgroundColor: '#bf59cf'}} variants={itemVariants}>
                         <input id="i-images" type='file' 
                             accept="image/png, image/gif, image/jpeg"
                             multiple='multiple'
@@ -76,6 +91,7 @@ export default function DropUp(props) {
                                 props.setPreviewSec(true); 
                                 props.setDocType('img'); 
                                 props.setDocuments(e.target.files);
+                                props.setState(false)
                             }}
                         />
                         <span style={{backgroundColor: '#ac44cf'}}></span>

@@ -13,6 +13,7 @@ export default function ImageSlider() {
                     initial={{ opacity: 0}}
                     animate={{opacity: 1}}
                     exit={{opacity: 0}}
+                    transition={{duration: .1}}
                 >
                     <section className='image_slider-header'>
                         <div className='image_slider-header_contact'>
@@ -27,6 +28,7 @@ export default function ImageSlider() {
                             initial={{scale: 0.3, opacity: 0}}
                             animate={{scale: 1, opacity: 1}}
                             exit={{scale: 0.3, opacity: 0}}
+                            transition={{duration: .3}}
                         />
                     </section>
                 </motion.div>

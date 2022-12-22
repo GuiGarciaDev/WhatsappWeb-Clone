@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import './style.scss';
 
 export default function FileOverlay({ color, title }) {

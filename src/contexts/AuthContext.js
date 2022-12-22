@@ -21,7 +21,6 @@ export function AuthProvider({ children }) {
                 online: false,
                 email: email,
                 last_connection: "00:00",
-                last_message: "",
                 group: [],
                 contacts: []
             }) 

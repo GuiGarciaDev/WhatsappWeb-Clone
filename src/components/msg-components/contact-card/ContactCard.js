@@ -22,8 +22,9 @@ export default function ContactCard({ el, id, chatId }) {
         lastMessageRef.current?.scrollIntoView({ behavior: "smooth" })
 
         async function getData() {
-            const contactData = await getContactWithId(el.contactId)
-            setData(contactData)
+            await getContactWithId(el.contactId).then(contactData => {
+                setData(contactData)
+            })
         }
 
         getData()
@@ -49,7 +50,7 @@ export default function ContactCard({ el, id, chatId }) {
                 <span id='contact-card-time' >{el.time}</span>
                 {
                     el.autor === currentUser.email 
-                    ? <BsCheckAll style={el.isRead ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
+                    ? <BsCheckAll style={el.read ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
                     : <></>
                 }
             </div>

@@ -17,17 +17,16 @@ export default function RepCard({ el, id, chatId }) {
     const dropdownId = 'dd' + id;
 
     async function setRepState() {
-        const repMessage = await getRepliedMsg(el.repId, chatId)
-        setRepliedMessage(repMessage)
+        await getRepliedMsg(el.repId, chatId).then(repMessage => {
+            setRepliedMessage(repMessage)
 
-        if (repliedMessage.type === "contact") {
-            const repUser = await getContactWithId(repMessage.contactId)
-            setRepliedUser(repUser)
-        }
+            if (repMessage.type === "contact") {
+                getContactWithId(repMessage.contactId).then(repUser => {
+                    setRepliedUser(repUser)
+                })
+            }
+        })
     }
-    useEffect(() => {
-        setRepState()
-    }, [repliedMessage])
 
     useEffect(() => {
         setRepState()
@@ -79,7 +78,7 @@ export default function RepCard({ el, id, chatId }) {
                 <span id='message-card-time' >{el.time}</span>
                 {
                     el.autor === currentUser.email 
-                    ? <BsCheckAll style={el.isRead ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
+                    ? <BsCheckAll style={el.read ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
                     : <></>
                 }
             </div>

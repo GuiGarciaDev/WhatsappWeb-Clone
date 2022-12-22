@@ -35,7 +35,7 @@
         width: 50px;
         height: 50px;
         border-radius: 100%;
-        //animation: showButton 300ms linear;
+        transition: none !important;
         cursor: pointer;
 
         input {
@@ -45,18 +45,6 @@
         svg {
             position: absolute;
         }
-
-        // @keyframes showButton {
-        //     0% {
-        //         transform: scale(0);
-        //     }
-        //     60% {
-        //         transform: scale(1.3);
-        //     }
-        //     100% {
-        //         transform: scale(1);
-        //     }
-        // }
 
         span {
             align-self: flex-start;

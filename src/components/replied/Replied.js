@@ -19,15 +19,16 @@ export default function Replied () {
     const fileName = repMessage[1].fileName     // 5: fileName -> string
 
     async function getContact() {
-        if (repMessage[1].type === 'contact') {
-            const data = await getContactWithId(repMessage[1].contactId)
-            setData(data)
+        if (repMessage[1].contactId) {
+            getContactWithId(repMessage[1].contactId).then(data => {
+                setData(data)
+            })
         }
     }
 
     useEffect(() => {
         getContact()
-    }, [repMessage])
+    }, [state])
 
     return (
         <div className="rep-all" style={state ? {height: '70px'} : {height: '0px'}}>
@@ -35,7 +36,7 @@ export default function Replied () {
                 <span></span>
                 <div className='dividerReplied'>
                     <div className='autorContent'>
-                        <p className='autor'>{autor  === currentUser.email ? 'Você' : repMessage[2]}</p>
+                        <p className='autor'>{autor  === currentUser.email ? 'Você' : repMessage[1].autor}</p>
                         <div>
                         { type === 'img'
                             ? <p><AiFillCamera/>Foto</p>

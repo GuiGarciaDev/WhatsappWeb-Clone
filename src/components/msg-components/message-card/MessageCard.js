@@ -33,7 +33,7 @@ export default function MessageCard({ el, id, chatId }) {
                 <span id='message-card-time' >{el.time}</span>
                 {
                     el.autor === currentUser.email 
-                    ? <BsCheckAll style={el.isRead ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
+                    ? <BsCheckAll style={el.read ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
                     : <></>
                 }
             </div>

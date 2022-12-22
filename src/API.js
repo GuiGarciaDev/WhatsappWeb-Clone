@@ -1,12 +1,13 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { getDate, getFullDate, getTime } from "./date";
 import { firedb as db, storage} from "./firebase";
+import { toastEmiterError, toastEmiterSuccess } from "./toastifyemiter";
 
 export function generateId (userID, friendID) {
-    const newChatId = userID > friendID 
-      ? userID + friendID
-      : friendID + userID
+    const newChatId = `${userID}` > `${friendID}` 
+      ? `${userID}` + `${friendID}`
+      : `${friendID}` + `${userID}`
 
     return newChatId
 }
@@ -35,24 +36,51 @@ export async function getMessageForReply(id, chatId) {
     return repMessage.docs[0].data()
 }
 
-export async function getFile( path ) {
-    // Not working yet, built for get preview of pdf document in message
-    // return await getBlob(ref(storage, path))
-    // const xhr = new XMLHttpRequest();
-    // xhr.responseType = 'blob';
-    // xhr.onload = (event) => {
-    //   const blob = xhr.response;
-    // };
-    // xhr.open('GET', url);
-    // xhr.send();
-}
-
 export async function getContactWithId(id) {
+    let data;
     const userRef = collection(db, 'users')
     const contactRef = query(userRef, where('id', '==', id))
-    const contact = await getDocs(contactRef)
+    await getDocs(contactRef).then(x => {
+        data = x.docs[0].data()
+    })
+    return data
+}
 
-    return contact.docs[0].data()
+export async function getContactWithEmail(email) {
+    let data;
+    const userRef = collection(db, 'users')
+    const contactRef = query(userRef, where('email', '==', email))
+    await getDocs(contactRef).then(x => {
+        data = x.docs[0].data()
+    })
+    return data
+}
+
+export async function updateReadStatus(ref, chatId) {
+    await getDocs(ref).then(docs => {
+        docs.forEach(document => {
+            updateDoc(doc(db, 'chat', chatId, 'messages', document.id), {
+                'read': true
+            })
+        })
+    })  
+}
+
+export async function addContact( userEmail, contactEmail ) { // onSnapshot have to update this collection when new chat id is generated
+    if (!(userEmail === contactEmail)) {
+        try {
+          setDoc(doc(db, 'users', userEmail, 'recents', contactEmail), {
+            'added': true,
+            'email': contactEmail
+          }).then(
+            toastEmiterSuccess('Amigo adicionado com sucesso!')
+          )
+        } catch (error) {
+          console.log(error);
+        }  
+      } else {
+        toastEmiterError('Você não pode se adicionar')
+      }
 }
 
 export async function sendContacts( userEmail, contact, contacts ) { // Send contact message to your friend
@@ -70,15 +98,10 @@ export async function sendContacts( userEmail, contact, contacts ) { // Send con
             "for": contact.email,
             "clearedFor": {},
             "type": 'contact',
-            "contactId": contacts[i],
+            "contactId": parseInt(contacts[i]),
         }).then(function (docRef) {
             updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
                 "id": docRef.id
-            })
-            updateDoc(doc(db, 'users', contact.email), {
-                'messages_not_readed': {
-                    [userEmail]: (contact.messages_not_readed[userEmail] + 1)
-                }
             })
         })
     }
@@ -93,33 +116,31 @@ export function sendFile(file, userEmail, contact, type) { // handleUpload()
 
     uploadTask.on(
       "state_changed",
-       (snapshot) => {
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            addDoc(chatMessages, { // Message type Image sent to chatId room
-                "content": '',
-                "autor": userEmail,
-                "for": contact.email,
-                "read": false,
-                "time": getTime(),
-                "date": getFullDate(),
-                "cardDate": getDate(),
-                "fileUrl": url,
-                "fileSizeType": generateSizeAndTypeString(file.size, file.type),
-                "fileName": file.name,
-                "type": type,
-                "clearedFor": {},
-            }).then(function (docRef) {
-                updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
-                    "id": docRef.id
-                })
-                updateDoc(doc(db, 'users', contact.email), {
-                    'messages_not_readed': {
-                        [userEmail]: (contact.messages_not_readed[userEmail] + 1)
-                    }
+        null,
+        null,
+        () => { // After complete, this function is called
+            getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+                addDoc(chatMessages, { // Message type Image sent to chatId room
+                    "content": '',
+                    "autor": userEmail,
+                    "for": contact.email,
+                    "read": false,
+                    "time": getTime(),
+                    "date": getFullDate(),
+                    "cardDate": getDate(),
+                    "fileUrl": url,
+                    "fileSizeType": generateSizeAndTypeString(file.size, file.type),
+                    "fileName": file.name,
+                    "type": type,
+                    "clearedFor": {},
+                }).then(function (docRef) {
+                    updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
+                        "id": docRef.id
+                    })
                 })
             })
-        })
-      }
+          }
+       
     )
 }
 
@@ -164,7 +185,6 @@ export async function uploadMessage( userEmail, contact, value ) { // Send messa
 
     const chatId = generateId(userEmail, contact.email)   
     const chatMessages = collection(db, "chat", chatId, 'messages')
-    console.log(contact.messages_not_readed);
 
     addDoc(chatMessages, { // Message sent to chatId room
         "content": value,
@@ -180,48 +200,8 @@ export async function uploadMessage( userEmail, contact, value ) { // Send messa
         updateDoc(doc(db, "chat", chatId, 'messages', docRef.id), {
             "id": docRef.id
         })
-        updateDoc(doc(db, 'users', contact.email), {
-            'messages_not_readed': {
-                [userEmail]: (contact.messages_not_readed[userEmail] + 1)
-            }
-        })
-    })
-    
+    })   
 }
-
-// export async function updateLastMessageIn(userEmail, friendEmail, docRef) {
-//     // Params:
-
-//     const ref = await getDoc(doc(db, 'users', userEmail))
-//     const userData = ref.data()
-//     const lastMessage = await getDoc(docRef)
-//     const lastMessageData = lastMessage.data()
-
-//     try {
-//         switch (lastMessageData.type) {
-//             case 'text':
-//                 await updateDoc(doc(db, 'users', userEmail), {
-//                     "last_message": {
-//                         ...userData.last_message,
-//                         [friendEmail]: [
-//                             lastMessageData.content, 
-//                             lastMessageData.cardDate, 
-//                             lastMessageData.read, 
-//                             lastMessageData.autor,
-//                         ]
-//                     }
-//                 })
-//                 break;
-//             case 'img':
-                
-//                 break;
-        
-//             default:
-//                 break;
-//         }
-        
-//     } catch (error) {console.log(error);}
-// }
 
 export function deleteMessage ( messageId, chatId ) {
     const messageRef = doc(db, "chat", chatId, 'messages', messageId)

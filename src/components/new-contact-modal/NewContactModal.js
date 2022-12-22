@@ -2,6 +2,8 @@ import './style.scss';
 
 import Modal from 'react-modal';
 import { useState } from 'react';
+import { addContact } from '../../API';
+import { useData } from '../../contexts/MessageContext';
 
 const customStyles = {
     overlay: {
@@ -21,7 +23,9 @@ const customStyles = {
     },
 };
 
-export default function NewContactModal({ state, closeFunction, children}) {
+export default function NewContactModal({ state, closeFunction }) {
+    const [email, setEmail] = useState('');
+    const { user } = useData()
 
     return (
         <Modal
@@ -35,7 +39,13 @@ export default function NewContactModal({ state, closeFunction, children}) {
         >
             <div className="deleteModalConversation-content">
                 <h2>Adicionar contato</h2>
-                {children}
+                <div className='email-holder'>
+                    <input placeholder='Friend Email' type='email' autoComplete='off' onChange={(e) => setEmail(e.target.value)}/>
+                </div>
+                <div className="button-holder">
+                    <button onClick={() => closeFunction(false)}>CANCELAR</button>
+                    <button className='confirmButton' onClick={() => {addContact(user.email, email); closeFunction(false)}}>ADICIONAR</button>
+                </div>
             </div>
         </Modal>
     )

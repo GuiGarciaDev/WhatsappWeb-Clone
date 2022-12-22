@@ -49,7 +49,6 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
     const { repMessage, setRepMessage, setSendContactModal, setImage, setImageSlider } = useData()
     const chatboxInput = useRef();
 
-    //const [contact, setContact] = useState();
     const [messages, setMessages] = useState([])
     const [messageDate, setMessageDate] = useState([])
 
@@ -87,21 +86,6 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
         const userRef = doc(db, 'users', currentUser.email);
         const messagesRef = collection(db, "chat", chatId, 'messages')
 
-        async function updateReadStatus() {
-            const friendMessagesRef = query(messagesRef, where('autor', '!=', currentUser.email), where('read', '==', false))
-            const friendMessages = await getDocs(friendMessagesRef)
-            friendMessages.forEach((message) => {
-                updateDoc(doc(db, "chat", chatId, 'messages', message.data().id), {
-                    'read': true
-                })
-            })
-            updateDoc(userRef, {
-                'messages_not_readed': {
-                    [currentContact.email]: 0 
-                }
-            })
-        }
-
         const allMessages = query(messagesRef, orderBy('date', 'asc'))
 
         onSnapshot(allMessages, (snapshot) => {
@@ -122,13 +106,12 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                 } else {}
             }
             setMessageDate(MessageDate)
-            updateReadStatus()
         })
     }, [currentContact])
 
     // Default image for all users
-    const user_image = currentContact.photoUrl ? currentContact.photoUrl : "noImage.png";
-
+    //const user_image = currentContact.photoUrl ? currentContact.photoUrl : "noImage.png";
+    const user_image = "noImage.png";
     async function sendMessage() { // Send message to your friend
         const searchbar = document.getElementById("bottom-messageBar")
 
@@ -167,9 +150,7 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                             <div className="text-holder">
                                 <h1>{currentContact.name}</h1>
                                 <span>
-                                    {
-                                        currentContact.online ? "online" : "visto por último online às " + currentContact.last_connection
-                                    }
+                                    {currentContact.online ? "online" : "visto por último online às " + currentContact.last_connection}
                                 </span>
                             </div>
                         </div>
@@ -222,10 +203,10 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                         
                         <section className="bottom">
                             <EmojiPicker // Default emoji picker, responsible but the have high delay on picking emoji
-                            width={'100%'} height={emojiSec? '300px' : '0px'} 
-                            theme={'dark'} 
-                            previewConfig={{showPreview: false}}
-                            onEmojiClick={(emoji) =>  {chatboxInput.current.value += emoji.emoji}}
+                                width={'100%'} height={emojiSec? '300px' : '0px'} 
+                                theme={'dark'} 
+                                previewConfig={{showPreview: false}}
+                                onEmojiClick={(emoji) =>  {chatboxInput.current.value += emoji.emoji}}
                             />
                             {/* <div id="emoji-picker-holder" style={emojiSec ? {height: '300px'} : {height: '0px'}} ref={pickerHolder}>
                                 <Picker 
@@ -264,7 +245,8 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                                         >
                                             <AiOutlinePaperClip id="upFile"/>
                                         </button>
-                                        <DropUp state={filedropup} 
+                                        <DropUp state={filedropup}
+                                            setState={setFileDropup} 
                                             setPreviewSec={setPreviewSec} 
                                             setDocType={setDocType}
                                             setDocuments={setDocuments}

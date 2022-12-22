@@ -1,6 +1,6 @@
 import './style.scss'
 
-import Card from '../components/card';
+import Card from '../components/Card';
 import DefaultPage from '../components/default-page/DefautlPage';
 import MessagePage from '../components/message-page/MessagePage';
 import SearchBar from '../components/searchbar/SearchBar';
@@ -18,8 +18,7 @@ import { useData } from '../contexts/MessageContext';
 import { firedb as db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
-import { generateId, getContactWithId } from '../API';
-import { getFullDateWithSpace } from '../date';
+import { getFullDateWithSpace, getNormalDate } from '../date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toastEmiter, toastEmiterError } from '../toastifyemiter';
 import {
@@ -30,6 +29,7 @@ import {
 } from '../icons'
 import Contact from '../components/contact-card/Contact';
 import ImageSlider from '../components/image-slider/ImageSlider';
+import { getContactWithEmail, getContactWithId } from '../API';
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
@@ -37,9 +37,8 @@ export default function App() {
   // Front end
 
   const { 
-    messagePage, setMessagePage,
-    cardActived, setCardActived, 
-    sendContactModal, chatId, setChatId
+    messagePage, setMessagePage, cardActived,  
+    sendContactModal, chatId,
   } = useData()
 
   const [leftmenu, setLeftMenu] = useState(null);        // Controls the state of left menus
@@ -94,63 +93,48 @@ export default function App() {
   }, [])
 
   // Back end
-  const [error, setError] = useState('')
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
   
   const { user, setUser, contact, openConversation } = useData()
   const [contacts, setContacts] = useState([]) // users/user => other users tha you have added
-
-  const [email, setEmail] = useState('')
+  const [recents, setRecents] = useState([]);
 
   const userRef = doc(db, 'users', currentUser.email);
-  //const chatRef = collection(db, "chat")
-  const contactsRef = collection(db, "users")
 
   useEffect(() => {
-    async function putContact(contacts) {
-      setContacts([])
-      let contactsArray = []
-      for (let i = 0; i < contacts.length; i++) { // Picking all users inside current user contact list
-        const q = query(contactsRef, where('email', '==', contacts[i]))
-        const data = await getDocs(q)
-        data.forEach((contact) => {
-          contactsArray.push(contact.data())
-          setContacts(contactsArray.map((contact) => contact))
-        })
-      }
-    }
     onSnapshot(userRef, (snapshot) => {
       setUser(snapshot.data());
-
-      let contactsList = snapshot.data().contacts ?? snapshot.data().contacts
-      putContact(contactsList)
     })   
+
+    onSnapshot(collection(db, 'users', currentUser.email, 'recents'), (snapshot) => {
+      let contacts = [] // Get users added by you and render that in newMessageSection
+      snapshot.docs.map((contact) => {
+        if (contact.data().added) {
+          getContactWithEmail(contact.data().email).then(res => {
+            contacts.push(res)
+            setContacts(contacts.map((contact) => contact))
+          })
+        }
+      })
+    })
+
+    onSnapshot(collection(db, 'chat'), () => {
+      let array = [] // Get users all recent talks and render that in leftColumn content
+      const q = query(collection(db, 'chat'), where('participants', 'array-contains', currentUser.email))
+      getDocs(q).then(res => {
+        res.forEach(chat => {
+          let otherEmail = chat.data().participants.filter((x) => {return x !== currentUser.email})
+          getContactWithEmail(otherEmail[0]).then(res => {
+            array.push(res)
+            setRecents(array.map((contact) => contact))
+          })
+        })
+      })
+    })
   }, [])
 
   let user_image = user.photoUrl ? user.photoUrl : 'noImage.png'
-
-  async function addContact (email) {
-    setError('')
-    if (!(currentUser.email === email)) {
-      try {
-
-        updateDoc(userRef, {
-          "contacts": [
-            ...user.contacts,
-            email
-          ],
-        })
-  
-      } catch (error) {
-        console.log(error);
-      }  
-    } else {
-      setError('Cannot add yourself!')
-      console.log('Cannot add yourself!');
-    }
-    setNewContactModal(false)
-  }
     
   const updateUser = async () => {
     setDoc(userRef, {
@@ -159,19 +143,18 @@ export default function App() {
   }
 
   async function handleLogout() {
-    setError('')
-
     try {
-      await logout()
       updateDoc(userRef, {
-        "last_connection": getFullDateWithSpace()
-      })
-      navigate('/login')
-    } catch {
-      setError('Failed to log out')
+        "last_connection": getNormalDate()
+      }).then(
+        logout(),
+        navigate('/login')
+      )
+    } catch(error) {
+      toastEmiterError('Failed to log out')
+      console.log(error);
     }
   }
-
   return (
     <div id="page">
       <div className={"left-column"} style={messagePage && windowSize.innerWidth <= 630 ? {width: '0'} : {}}>
@@ -221,25 +204,18 @@ export default function App() {
           
           <div className="content-holder">
             { !filter 
-              ? contacts.map((contact, idx) => {
-                try {
-                  return (
-                    <Card 
-                      title={contact.name} 
-                      contactEmail={contact.email}
-                      content={user.last_message[contact.email][0]} 
-                      id={idx}
-                      date={user.last_message[contact.email][1]} 
-                      image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
-                      key={idx} 
-                      active={cardActived} 
-                      read={user.last_message[contact.email][2]}
-                      order={() => openConversation(contact.id)}
-                      isMy={!(user.last_message[contact.email][3] === contact.email)}
-                      notReaded={user.messages_not_readed[contact.email]}
-                    />
-                  )
-                } catch (error) {}
+              ? recents.map((contact, idx) => {
+                return (
+                  <Card 
+                    title={contact.name} 
+                    contactEmail={contact.email}
+                    id={idx}
+                    image={contact.photoUrl ? contact.photoUrl : 'noImage.png'} 
+                    key={idx} 
+                    active={cardActived} 
+                    order={() => openConversation(contact.id)}
+                  />
+                )
               }) 
               : <AnimatePresence>
                 { filter && (
@@ -503,19 +479,7 @@ export default function App() {
         }
       </div>
 
-      <NewContactModal 
-        state={newContactModal} 
-        closeFunction={() => setNewContactModal(false)} 
-      >
-        <div className='email-holder'>
-            <input placeholder='Friend Email' type='email' autoComplete='off' onChange={(e) => setEmail(e.target.value)}/>
-        </div>
-        <div className="button-holder">
-            <button onClick={() => setNewContactModal(false)}>CANCELAR</button>
-            <button className='confirmButton' onClick={() => addContact(email)}>ADICIONAR</button>
-        </div>
-      </NewContactModal>
-
+      <NewContactModal state={newContactModal} closeFunction={setNewContactModal} />
       <SendContactModal openState={sendContactModal} contacts={contacts}/>
 
       <ImageSlider />

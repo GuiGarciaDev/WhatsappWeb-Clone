@@ -9,10 +9,8 @@ import { sendFile } from '../../API';
 import './style.scss'
 
 export default function PrevImgSection({docs, state, userEmail, contact}) {
-    const [documents, setDocuments] = useState([]);
     const [currentDoc, setCurrentDoc] = useState(docs[0]);
     const [files, setFiles] = useState(Array.from(docs));
-    const addInput = useRef()
 
     function getUrl(file) {
         let url = URL.createObjectURL(file)
@@ -31,7 +29,9 @@ export default function PrevImgSection({docs, state, userEmail, contact}) {
     }
 
     function uploadImages(images) {
+        console.log(images);
         images.forEach(image => {
+            console.log(image);
             sendFile(image, userEmail, contact, 'img')
         })
         state(false)
@@ -84,10 +84,9 @@ export default function PrevImgSection({docs, state, userEmail, contact}) {
                     <input id='new-img' type='file' 
                         accept="image/png, image/gif, image/jpeg" 
                         multiple='multiple'
-                        ref={addInput}
                         onInput={(e) => {
-                            getUrl(e.target.files).forEach(doc => {
-                                setDocuments((prev) => [...prev, doc]) /// LOOK THIS 
+                            Array.from(e.target.files).forEach(doc => {
+                                setFiles(prev => [...prev, doc])
                             })
                         }}
                     />

@@ -1,7 +1,9 @@
+import { setDoc, doc } from 'firebase/firestore';
 import React from 'react'
 import { useContext } from 'react'
 import { useState } from 'react';
 import { generateId, getContactWithId } from '../API';
+import { firedb as db } from '../firebase';
 
 const DataContext = React.createContext(); // Change it for a better name (GlobalContext is a good idea?)
 
@@ -26,11 +28,15 @@ export function DataProvider({ children }) {
     const [sendContactModal, setSendContactModal] = useState(false); // Open Send Contact Modal in App.js
 
     async function openConversation(id) {
-        const contact = await getContactWithId(id)
-        setContact(contact)
-        setMessagePage(true);
-        setChatId(generateId(user.email, contact.email))
-        //setLeftMenu(false) // close newMessageMenu when open new conversation 
+        await getContactWithId(id).then(contact => {
+            setContact(contact)
+            setMessagePage(true);
+            setChatId(generateId(user.email, contact.email))
+
+            setDoc(doc(db, 'chat', generateId(user.email, contact.email)), {
+                'participants': [user.email, contact.email]
+            })
+        })
     } 
 
     const value = {

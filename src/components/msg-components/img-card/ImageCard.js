@@ -27,15 +27,15 @@ export default function ImageCard({ el, id, chatId }) {
             : {alignSelf: 'flex-start', borderRadius: '0 10px 10px 10px'}}
         ref={lastMessageRef}
         >
-            <button className='image-card-content' onClick={() => {setImageSlider(true); setImage(el.photoUrl)}}>
-                <img src={el.photoUrl ?? el.photoUrl}></img>
+            <button className='image-card-content' onClick={() => {setImageSlider(true); setImage(el.fileUrl)}}>
+                <img src={el.fileUrl ?? el.fileUrl}></img>
                 <label style={el.autor === currentUser.email ? {right: '-12px'} : {left: '-12px', transform: 'scale(-1, 1)'}}/>
             </button>
             <div className='time'>
                 <span id='image-card-time' >{el.time}</span>
                 {
                     el.autor === currentUser.email 
-                    ? <BsCheckAll style={el.isRead ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
+                    ? <BsCheckAll style={el.read ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
                     : <></>
                 }
             </div>
