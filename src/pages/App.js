@@ -142,13 +142,15 @@ export default function App() {
     }) 
   }
 
-  async function handleLogout() {
+  async function handleLogout() { // Need to fix that => Error: Permission denied
     try {
       updateDoc(userRef, {
         "last_connection": getNormalDate()
       }).then(
-        logout(),
-        navigate('/login')
+        async () => {
+          navigate('/login')
+          await logout()
+        }
       )
     } catch(error) {
       toastEmiterError('Failed to log out')
