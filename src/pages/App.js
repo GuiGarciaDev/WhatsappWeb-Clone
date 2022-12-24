@@ -142,7 +142,7 @@ export default function App() {
     }) 
   }
 
-  async function handleLogout() { // Need to fix that => Error: Permission denied
+  async function handleLogout() {
     try {
       updateDoc(userRef, {
         "last_connection": getNormalDate()
@@ -157,6 +157,7 @@ export default function App() {
       console.log(error);
     }
   }
+  
   return (
     <div id="page">
       <div className={"left-column"} style={messagePage && windowSize.innerWidth <= 630 ? {width: '0'} : {}}>
