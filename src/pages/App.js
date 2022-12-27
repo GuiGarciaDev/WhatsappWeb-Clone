@@ -18,7 +18,7 @@ import { useData } from '../contexts/MessageContext';
 import { firedb as db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
-import { getFullDateWithSpace, getNormalDate } from '../date';
+import { getNormalDate } from '../date';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toastEmiter, toastEmiterError } from '../toastifyemiter';
 import {
@@ -29,7 +29,8 @@ import {
 } from '../icons'
 import Contact from '../components/contact-card/Contact';
 import ImageSlider from '../components/image-slider/ImageSlider';
-import { getContactWithEmail, getContactWithId } from '../API';
+import { getContactWithEmail } from '../API';
+import ThemeModal from '../components/modals/theme-modal/ThemeModal';
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
@@ -48,6 +49,7 @@ export default function App() {
   const [filter, setFilter] = useState(false);
 
   const [newContactModal, setNewContactModal] = useState(false) // Open / close modal for add new contact
+  const [themeModal, setThemeModal] = useState(false);
   
   //const [hasFavorite, setHasFavorite] = useState(false);
   let hasFavorite = false; // Just for stop advice about non use setHasFavorite yet
@@ -449,28 +451,28 @@ export default function App() {
               <span>{user.status}</span>
             </div>
           </button>
-          <ConfigCard title={'Notificações'} action={toastEmiterError}>
+          <ConfigCard title={'Notificações'} action={() => toastEmiterError('Undefined')}>
             <AiFillBell/>
           </ConfigCard>
-          <ConfigCard title={'Privacidade'} action={toastEmiterError}>
+          <ConfigCard title={'Privacidade'} action={() => toastEmiterError('Undefined')}>
             <MdLock/>
           </ConfigCard>
-          <ConfigCard title={'Segurança'} action={toastEmiterError}>
+          <ConfigCard title={'Segurança'} action={() => toastEmiterError('Undefined')}>
             <BiShieldQuarter/>
           </ConfigCard>
-          <ConfigCard title={'Tema'} action={toastEmiterError}>
+          <ConfigCard title={'Tema'} action={() => setThemeModal(true)}>
             <MdBrightnessMedium/>
           </ConfigCard>
-          <ConfigCard title={'Papel de parede da conversa'} action={toastEmiterError}>
+          <ConfigCard title={'Papel de parede da conversa'} action={() => toastEmiterError('Undefined')}>
             <RiImageEditFill/>
           </ConfigCard>
-          <ConfigCard title={'Solicitar dados da conta'} action={toastEmiterError}>
+          <ConfigCard title={'Solicitar dados da conta'} action={() => toastEmiterError('Undefined')}>
             <HiDocumentText/>
           </ConfigCard>
-          <ConfigCard title={'Atalhos do teclado'} action={toastEmiterError}>
+          <ConfigCard title={'Atalhos do teclado'} action={() => toastEmiterError('Undefined')}>
             <VscSymbolKey/>
           </ConfigCard>
-          <ConfigCard title={'Ajuda'} action={toastEmiterError}>
+          <ConfigCard title={'Ajuda'} action={() => toastEmiterError('Undefined')}>
             <IoMdHelpCircle/>
           </ConfigCard>
         </LeftSideMenu>
@@ -484,6 +486,7 @@ export default function App() {
 
       <NewContactModal state={newContactModal} closeFunction={setNewContactModal} />
       <SendContactModal openState={sendContactModal} contacts={contacts}/>
+      <ThemeModal state={themeModal} closeFunction={setThemeModal}/>
 
       <ImageSlider />
     </div>
