@@ -5,27 +5,28 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { toastEmiterError } from '../../toastifyemiter';
  
 const itemVariants = {
-    closed: { opacity: 0, y: 30, },
+    closed: { scale: 0, y: 30},
     open: {
-        opacity: 1,
+        scale: 1,
         y: 0,
+        transition: {
+            duration: .15
+        }
     }
 }
 
 const dropUpVariants = {
     closed: { 
         opacity: 0,
-        y: 80,
         transition: {
             when: 'afterChildren',
         } 
     },
     open: {
         opacity: 1,
-        y: 0,
         transition: {
             //when: 'beforeChildren',
-            staggerChildren: 0.07,
+            staggerChildren: .1,
             staggerDirection: -1,
         }
     }

@@ -14,8 +14,8 @@
         column-gap: 30px;
         height: 100px;
         padding: 60px 0 25px 20px;
-        background-color: var(--background-right);
-
+        background-color: var(--left_menu-background-up);
+        
         button {
             padding: 0;
             border: 0;
@@ -24,8 +24,7 @@
             cursor: pointer;
 
             svg {
-                fill: var(--text-primary);
-                opacity: 0.9;
+                fill: var(--left_menu-title);
                 height: 20px;
                 width: 20px;
             }
@@ -34,8 +33,7 @@
         span {
             font-size: 19px;
             font-weight: 600;
-            color: var(--text-primary);
-            opacity: 0.9;
+            color: var(--left_menu-title);
         }
     }
 

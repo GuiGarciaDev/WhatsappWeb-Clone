@@ -39,11 +39,10 @@
           background-color: transparent;
 
           svg {
-            color: var(--icon-fixed);
+            color: var(--left_up-icon);
             width: 25px;
             height: 25px;
             padding: 1px;
-            opacity: 0.6;
             cursor: pointer;
           }
         }
@@ -330,7 +329,7 @@
           width: 55px;
           margin-right: 20px;
           border-radius: 50%;
-          background-color: var(--group-img-background);
+          background-color: var(--primary-green);
 
           svg {
             justify-self: center;
@@ -342,7 +341,7 @@
         }
 
         span {
-          color: white;
+          color: var(---text-primary);
           align-items: center;
           font-size: 16px;
         }
@@ -362,12 +361,12 @@
 
         span {
           align-self: center;
-          color: white;
+          color: var(---text-secondary);
           opacity: 0.6;
 
           a {
             text-decoration: none;
-            color: var(--group-img-background);
+            color: var(--primary-green);
           }
         }
       }
@@ -448,7 +447,7 @@
     display: flex;
     height: 100%;
     width: 100%;
-    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid var(--right-column-border-left);
   }
 
   @media (max-width: 880px) {

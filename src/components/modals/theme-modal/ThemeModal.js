@@ -3,10 +3,10 @@ import "./ThemeModal.scss"
 import Modal from 'react-modal'
 import { customStyles } from '../../../modalSettings';
 import { useState } from "react";
-import { useData } from "../../../contexts/MessageContext";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export default function ThemeModal({state, closeFunction}) {
-    const { theme, setTheme } = useData()
+    const { theme, setTheme } = useTheme()
     const [prevTheme, setPrevTheme] = useState(theme);
 
     function handleSubmit(event) {
@@ -16,6 +16,7 @@ export default function ThemeModal({state, closeFunction}) {
             const html = document.querySelectorAll('html')[0]
             html.classList.remove(theme)
             html.classList.add(prevTheme)
+            localStorage.setItem('theme', prevTheme)
             setTheme(prevTheme)
         }
     }

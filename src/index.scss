@@ -9,7 +9,7 @@
   --contact-card-button-color: #53BDEB;
   --primary-green: #00a884;
   --bottom-searchBar: #2a3942;
-  --border: rgba(255, 255, 255, 0.077);
+  --contact_card-border: rgba(255, 255, 255, 0.077);
   --card-hover: #202c33; 
   --card-focus: #2a3942;
   --date-background: #222e35;
@@ -19,6 +19,8 @@
   --error-text: #e65f5f;
   --group-img-background: #00a884;
   --icon-fixed: #8696a0;
+  --left_menu-title: #fff;
+  --left_menu-background-up: #222e35;
   --link: #53bdeb;
   --line-divider: #8696a026;
   --message-background: #005c4b;
@@ -34,44 +36,55 @@
   --text-secondary: #E9EDEF70;
   --text-confirmButton-modal: #111b21;
   --text-cancelButton-modal: #00a884;
+  --bottom-icon-fixed: #fff;
+  --right-column-border-left: #ffffff26;
+  --left_up-icon: #8696a0;
+  --right_menu-top-icon: #8696a0;
 }
 
 .light-mode:root {
   --auth-border: #ffffff50;
-  --background-right: #50ae95;
-  --background-left: #73aed2;
-  --background-friend-profile: #0c1317;
-  --background-card-inside: #025144;
-  --background-confirmButton-modal: #00a884;
-  --background-confirmButtonHover-modal: #06cf9c;
+  --background-right: #f0f2f5; 
+  --background-left: #fff;
+  --name: #41525d;
+  --text-primary: #41525d;
+  --text-secondary: #667781;
+  --card-hover: #f5f6f6; 
+  --card-focus: #f0f2f5;
+  --message-background: #d9fdd3;
+  --background-confirmButton-modal: #008069;
+  --background-confirmButtonHover-modal: #017561;
+  --modal-background: #fff;
+  --modal-border-button: #e9edef;
+  --modal-button-hover: #fff;
+  --modal-backdrop: #fdfdfcd9;
+  --text-confirmButton-modal: #fff;
+  --text-cancelButton-modal: #008069;
   --contact-card-button-color: #53BDEB;
+  --icon-fixed: #54656f;
+  --left_menu-title: white;
+  --left_menu-background-up: #008069;
+  --down-border: #25d366;
+  --contact_card-border: rgba(0, 0, 0, 0.077);
+  --dropdown-background: #fff;
+  --dropdown-backgrouund-hover: #f5f6f6;
+  --background-friend-profile: #f0f2f5;
+  --background-card-inside: #d1f4cc;
   --primary-green: #00a884;
-  --bottom-searchBar: #2a3942;
-  --border: rgba(255, 255, 255, 0.077);
-  --card-hover: #202c33; 
-  --card-focus: #2a3942;
-  --date-background: #222e35;
-  --down-border: #008069;
-  --dropdown-background: #233138;
-  --dropdown-backgrouund-hover: #182229;
+  --secondary-green: #25d366;
+  --bottom-icon-fixed: #54656f;
+  --bottom-searchBar: #fff;
   --error-text: #e65f5f;
-  --group-img-background: #00a884;
-  --icon-fixed: #8696a0;
   --link: #53bdeb;
+  --right-column-border-left: #26242408;
+  --left_up-icon: #54656f;
+  --right_menu-top-icon: #54656f;
+
+  --date-background: #222e35;
   --line-divider: #8696a026;
-  --message-background: #005c4b;
-  --modal-background: #3b4a54;
-  --modal-border-button: #8696a026;
-  --modal-button-hover: #e9edef0d;
-  --modal-backdrop: #0b141ad9;
-  --name: #efefefd3;
   --rep-primary: #00a884;
   --rep-2: #53bdeb;
   --rep-3: #00a884;
-  --text-primary: #E9EDEF;
-  --text-secondary: #E9EDEF70;
-  --text-confirmButton-modal: #111b21;
-  --text-cancelButton-modal: #00a884;
 }
 
 body {

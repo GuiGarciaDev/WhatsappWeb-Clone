@@ -16,8 +16,6 @@ export function DataProvider({ children }) {
     const [chatId, setChatId] = useState('')              // Parameter of <MessagePage/> component in App.js (id of chat)
     const [cardActived, setCardActived] = useState('');   // Parameter of <MessagePage/> component in App.js (change bg of card in leftColumn)
     const [contact, setContact] = useState([]);           // Parameter of <MessagePage/> component in App.js (set contact data to chat page)
-    
-    const [theme, setTheme] = useState('dark-mode');  // Theme of aplication     
 
     const [imageSlider, setImageSlider] = useState(false); // State for ImageSlider component (true || false)
     const [image, setImage] = useState(null); // Pass the image for slider
@@ -51,7 +49,6 @@ export function DataProvider({ children }) {
         sendContactModal, setSendContactModal,
         imageSlider, setImageSlider,
         image, setImage,
-        theme, setTheme,
         openConversation,
     }
     

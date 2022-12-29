@@ -23,7 +23,7 @@ import Replied from "../replied/Replied";
 
 import {
     BiSticker, BsEmojiSmile, HiArrowLeft, RiCloseFill, FaArrowRight,
-    FaMicrophone, AiOutlineGif, AiOutlinePaperClip, BsThreeDotsVertical, BsSearch
+    FaMicrophone, AiOutlineGif, AiOutlinePaperClip, BsThreeDotsVertical, BsSearch, AiOutlineRight
 } from '../../icons'
 import RightDropDown from "../dropdown/right-dropdown/RightDropDown";
 import { toastEmiterError } from "../../toastifyemiter";
@@ -295,7 +295,7 @@ export default function MessagePage({ currentContact, chatId, closeFunction }) {
                             <span>Arquivos de mídia, links e docs</span>
                             <div className="frow-end">
                                 <span>0</span>
-                                <img src="right-harrow.svg" alt=""></img>
+                                <AiOutlineRight/>
                             </div>
                         </button>
                     </div>

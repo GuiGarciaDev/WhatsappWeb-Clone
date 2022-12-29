@@ -1,3 +1,5 @@
+@import 'src/styles/variables.scss';
+
 .message-page {
     display: flex;
     width: 100%;
@@ -223,8 +225,7 @@
                     svg {
                         width: 24px;
                         height: 24px;
-                        color: white;
-                        opacity: 0.6;
+                        color: var(--bottom-icon-fixed);
                     }
 
                     .other-icons {
@@ -283,7 +284,6 @@
     #search-Mid, #friend-Mid {
         display: flex;
         flex-direction: column;
-        color: white;
         row-gap: 100px;
 
         .search-searchbar-holder {
@@ -293,7 +293,7 @@
         }
 
         span {
-            opacity: 0.6;
+            color: var(--text-secondary);
         }
 
         .search-span {
@@ -319,13 +319,14 @@
 
             img {
                 display: flex;
-                width: 200px;
-                height: 200px;
+                max-width: 200px;
+                max-height: 200px;
                 border-radius: 50%;
                 cursor: pointer; 
             }
 
             h2 {
+                color: var(--text-primary);
                 margin-top: 7px;
                 margin-bottom: 3px;
             }
@@ -345,7 +346,7 @@
 
             .profile-text {
                 font-size: 19px;
-                color: white;
+                color: var(--text-primary);
                 opacity: 1;
                 text-justify: auto;
             }
@@ -361,19 +362,20 @@
             .file-frow {
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
                 border: 0;
-                color: white;
                 background-color: transparent;
                 cursor: pointer;
 
                 .frow-end {
                     display: flex;
+                    align-items: center;
                     column-gap: 10px;
 
-                    img {
-                        opacity: 0.6;
-                        margin-top: 1px;
-                        filter: invert(100%) sepia(0%) saturate(7484%) hue-rotate(184deg) brightness(112%) contrast(97%);
+                    svg {
+                        width: 17px;
+                        height: 17px;
+                        fill: var(--text-secondary);
                     }
                 }
             }
