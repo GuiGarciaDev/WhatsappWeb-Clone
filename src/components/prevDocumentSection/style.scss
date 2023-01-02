@@ -13,16 +13,20 @@ button {
     align-items: center;
     width: 100%;
     height: 100%;
-    background-color: var(--background-left);
+    background-color: var(--prevSec-background-color);
+
+    @media (max-height: 430px) {
+        overflow: auto;
+    }
 
     #docs-preview-content {
         display: flex;
+        position: relative;
         flex-direction: column;
         align-items: center;
         width: 100%;
-        height: 540px;
+        height: 100%;
         padding: 8px 30px 10px 30px;
-        overflow-y: auto;
 
         #closeButton {
             position: absolute;
@@ -42,18 +46,32 @@ button {
             display: flex;
             height: 100%;
             align-items: center;
-            justify-content: flex-end;
+            margin-top: 30px;
+            justify-content: center;
             flex-direction: column;
-            color: white;
+            color: var(--text-secondary);
 
             p {
-                margin-bottom: 90px;
+                position: absolute;
+                top: 25px;
             }
 
             svg {
                 width: 180px;
                 height: 180px;
-                fill: white;
+                transition: .3s linear;
+                fill: var(--icon-fixed);
+
+                @media (max-height: 510px) {
+                    width: 150px;
+                    height: 150px;
+                }
+
+                @media (max-height: 480px) {
+                    width: 100px;
+                    height: 100px;
+                    margin-top: 10px;
+                }
             }
 
             .text {
@@ -64,7 +82,6 @@ button {
             .sizeType {
                 font-size: 14px;
                 color: var(--text-secondary);
-                margin-bottom: 100px;
             }
         }
 
@@ -116,7 +133,7 @@ button {
                 width: 60px;
                 height: 60px;
                 border-radius: 5px;
-                border: 3px solid white;
+                border: 3px solid var(--prevSec_border-color);
                 overflow: hidden;
 
                 &:hover, &:focus {
@@ -134,7 +151,7 @@ button {
                     background-color: transparent;
     
                     p {
-                        color: white;
+                        color: var(--text-secondary);
                         font-size: 9px;
                     }
     
@@ -177,12 +194,12 @@ button {
             width: 60px;
             height: 60px;
             border-radius: 5px;
-            border: 3px solid white;
+            border: 3px solid var(--prevSec_border-color);
             cursor: pointer;
 
             svg {
                 transform: scale(1.2);
-                fill: white;
+                fill: var(--prevSec_input_svg-color);
             }
 
             #new-img {

@@ -120,6 +120,10 @@
 
 .card:hover {
     background-color: var(--card-hover);
+
+    .border-holder {
+      border-top: 1px solid var(--card-hover);
+    }
 }
 
 .card-active {

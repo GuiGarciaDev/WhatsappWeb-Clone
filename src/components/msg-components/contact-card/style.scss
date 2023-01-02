@@ -109,7 +109,7 @@
         display: flex;
         position: absolute;
         right: 8px;
-        color: rgba($color: white, $alpha: 0.6);
+        color: var(--icon-fixed);
     }
 
     .contact-card-dropbutton {
