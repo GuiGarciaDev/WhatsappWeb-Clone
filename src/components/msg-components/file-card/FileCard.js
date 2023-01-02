@@ -49,7 +49,7 @@ export default function FileCard({ el, id, chatId, type }) {
                 <span id='document-card-time' >{el.time}</span>
                 {
                     el.autor === currentUser.email 
-                    ? <BsCheckAll style={el.read ? {color: "#53bdeb"} : {color: "white", opacity: "0.6"}}/> 
+                    ? <BsCheckAll style={el.read ? {color: "#53bdeb"} : {color: 'var(--icon-fixed)'}}/> 
                     : <></>
                 }
             </div>

@@ -10,20 +10,6 @@
     bottom: 70px;
     z-index: 10;
     transform-origin: bottom;
-    //animation: holderY 100ms linear;
-
-    // @keyframes holderY {
-    //     0% {
-    //         transform: translateY(100px);
-    //     }
-    //     100% {
-    //         transform: translateY(0px);
-    //     }
-    // }
-
-    .test {
-        color: white;
-    }
 
     button, label {
         display: flex;
@@ -44,6 +30,7 @@
 
         svg {
             position: absolute;
+            color: white !important;
         }
 
         span {
