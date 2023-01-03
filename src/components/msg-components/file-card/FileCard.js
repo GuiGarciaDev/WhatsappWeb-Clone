@@ -8,18 +8,22 @@ import { BsCheckAll } from 'react-icons/bs';
 import { HiDocument } from 'react-icons/hi'
 import { IoIosArrowDown } from 'react-icons/io';
 import { MdDownload } from 'react-icons/md';
-import Pdf from '../../pdf-component/Pdf';
+import { toastEmiterError } from '../../../utils/toastifyemiter';
+//import Pdf from '../../pdf-component/Pdf';
 
 export default function FileCard({ el, id, chatId, type }) { 
     const lastMessageRef = useRef()
     const { currentUser } = useAuth()
-    const [modalDelete, setModalDelete] = useState(false); // Modal for delete specific message
     const [dropdown, setDropdown] = useState(false);
     const dropdownId = 'dd' + id;
 
     useEffect(() => {
         lastMessageRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [])
+
+    function downloadFile() {
+        toastEmiterError('Not fineshed yet')
+    }
 
     return (
         <div id={el.id} className="document-card" key={id}
@@ -40,7 +44,7 @@ export default function FileCard({ el, id, chatId, type }) {
                     <span className='title'>{el.fileName}</span>
                     <span>{el.fileSizeType}</span>
                 </div>
-                <button>
+                <button onClick={() => {downloadFile(el.fileUrl)}}>
                     <MdDownload/>
                 </button>
                 <label style={el.autor === currentUser.email ? {right: '-12px'} : {left: '-12px', transform: 'scale(-1, 1)'}}/>

@@ -1,12 +1,12 @@
 import './style.scss'
 import Modal from 'react-modal';
 import SearchBar from '../../searchbar/SearchBar';
-import { MdClose, IoMdSend } from '../../../icons'; 
+import { MdClose, IoMdSend } from '../../../utils/icons'; 
 import CustomCheckBox from '../../custom-checkbox/CustomCheckBox';
 import { useState } from 'react';
 import { useData } from '../../../contexts/MessageContext';
 import { sendContacts } from '../../../API';
-import { sendContactModalStyle } from '../../../modalSettings'
+import { sendContactModalStyle } from '../../../utils/modalSettings'
 import { useAuth } from '../../../contexts/AuthContext';
 
 export default function SendContactModal({ openState, contacts }) {

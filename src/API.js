@@ -1,8 +1,8 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { getDate, getFullDate, getTime } from "./date";
+import { getDate, getFullDate, getTime } from "./utils/date";
 import { firedb as db, storage} from "./firebase";
-import { toastEmiterError, toastEmiterSuccess } from "./toastifyemiter";
+import { toastEmiterError, toastEmiterSuccess } from "./utils/toastifyemiter";
 
 export function generateId (userID, friendID) {
     const newChatId = `${userID}` > `${friendID}` 
@@ -46,12 +46,28 @@ export async function getContactWithId(id) {
     return data
 }
 
+export async function userExists(email) {
+    let bool;
+    const userRef = collection(db, 'users')
+    const contactRef = query(userRef, where('email', '==', email))
+    await getDocs(contactRef).then((res) => {
+        if (res.docs.length > 0) {
+            bool = true
+        } else {
+            bool = false
+        }
+    })
+    return bool;
+}
+
 export async function getContactWithEmail(email) {
     let data;
     const userRef = collection(db, 'users')
     const contactRef = query(userRef, where('email', '==', email))
-    await getDocs(contactRef).then(x => {
-        data = x.docs[0].data()
+    await getDocs(contactRef).then((res) => {
+        if (res) {
+            data = res.docs[0].data()
+        }
     })
     return data
 }
@@ -73,8 +89,9 @@ export async function addContact( userEmail, contactEmail ) { // onSnapshot have
             'added': true,
             'email': contactEmail
           }).then(
-            toastEmiterSuccess('Amigo adicionado com sucesso!')
-          )
+            () => {toastEmiterSuccess('Usuário adicionado com sucesso!')}, 
+            () => {toastEmiterError('Ocorreu um erro')
+        })
         } catch (error) {
           console.log(error);
         }  

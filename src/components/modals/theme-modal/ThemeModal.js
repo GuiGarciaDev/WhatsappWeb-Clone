@@ -1,7 +1,7 @@
 import "./ThemeModal.scss"
 
 import Modal from 'react-modal'
-import { customStyles } from '../../../modalSettings';
+import { customStyles } from '../../../utils/modalSettings';
 import { useState } from "react";
 import { useTheme } from "../../../contexts/ThemeContext";
 

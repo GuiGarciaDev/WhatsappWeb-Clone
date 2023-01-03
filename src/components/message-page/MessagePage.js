@@ -1,8 +1,8 @@
 import "../message-page/style.scss";
 import { firedb as db } from "../../firebase";
 import React, { useEffect, useRef, useState } from "react";
-import { denunceTextModal } from "../../modalSettings";
-import { collection, doc, onSnapshot, orderBy, query, updateDoc, where, getDocs } from "firebase/firestore";
+import { denunceTextModal } from "../../utils/modalSettings";
+import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 import { uploadMessage, uploadRepMessage } from "../../API";
 import { useData } from "../../contexts/MessageContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -24,9 +24,9 @@ import Replied from "../replied/Replied";
 import {
     BiSticker, BsEmojiSmile, HiArrowLeft, RiCloseFill, FaArrowRight,
     FaMicrophone, AiOutlineGif, AiOutlinePaperClip, BsThreeDotsVertical, BsSearch, AiOutlineRight
-} from '../../icons'
+} from '../../utils/icons'
 import RightDropDown from "../dropdown/right-dropdown/RightDropDown";
-import { toastEmiterError } from "../../toastifyemiter";
+import { toastEmiterError } from "../../utils/toastifyemiter";
 
 export default function MessagePage({ currentContact, chatId, closeFunction }) { 
     const [rightmenu, setRightMenu] = useState(null);

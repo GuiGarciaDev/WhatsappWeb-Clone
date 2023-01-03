@@ -1,7 +1,7 @@
 import "./style.scss";
 import { useState } from "react";
 
-import { HiArrowLeft, BsSearch } from '../../icons';
+import { HiArrowLeft, BsSearch } from '../../utils/icons';
 
 import Search from "../search/Search";
 

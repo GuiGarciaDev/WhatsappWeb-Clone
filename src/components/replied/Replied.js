@@ -1,4 +1,4 @@
-import { AiOutlineClose, AiFillCamera, HiDocument, HiUser  } from '../../icons'
+import { AiOutlineClose, AiFillCamera, HiDocument, HiUser  } from '../../utils/icons'
 import { useAuth } from '../../contexts/AuthContext'
 import { useData } from '../../contexts/MessageContext'
 import'./style.scss'

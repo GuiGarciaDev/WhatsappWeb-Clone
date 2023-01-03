@@ -1,8 +1,8 @@
 import './style.scss'
 import FileOverlay from '../file-overlay/FileOverlay';
-import { BsFillImageFill, BsCameraFill, IoMdDocument, HiUser, RiStickyNoteFill } from '../../icons'
+import { BsFillImageFill, BsCameraFill, IoMdDocument, HiUser, RiStickyNoteFill } from '../../utils/icons'
 import { AnimatePresence, motion } from 'framer-motion'
-import { toastEmiterError } from '../../toastifyemiter';
+import { toastEmiterError } from '../../utils/toastifyemiter';
  
 const itemVariants = {
     closed: { scale: 0, y: 30},

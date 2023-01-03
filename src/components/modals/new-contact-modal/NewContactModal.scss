@@ -1,14 +1,17 @@
-.deleteModalConversation-content {
-    display: flex;
-    flex-direction: column;
+.newContactModal-content {
     width: 480px;
     padding: 10px;
-    row-gap: 20px;
 
     h2 {
         color: var(--text-primary);
         font-weight: 400;
         font-size: 20px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
     }
 
     .email-holder {
@@ -21,8 +24,8 @@
         input {
             border: 0;
             all: unset;
-            caret-color: white;
-            color: white;
+            caret-color: var(--text-primary);
+            color: var(--text-primary);
             width: 100%;
             text-overflow: ellipsis;
             white-space: nowrap;

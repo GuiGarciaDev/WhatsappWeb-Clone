@@ -1,7 +1,7 @@
 import './style.scss';
 import Modal from 'react-modal'
 import CustomCheckBox from '../../custom-checkbox/CustomCheckBox';
-import { customStyles } from '../../../modalSettings';
+import { customStyles } from '../../../utils/modalSettings';
 
 export default function TwoOptionsModal(props) {
 

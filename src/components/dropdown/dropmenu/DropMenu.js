@@ -1,7 +1,7 @@
 import './style.scss'
 import { useRef, useEffect } from "react";
 import Modal from 'react-modal';
-import { customStyles } from "../../../modalSettings";
+import { customStyles } from "../../../utils/modalSettings";
 import { clearMessage, deleteMessage, getMessageForReply } from '../../../API';
 import { useState } from "react";
 

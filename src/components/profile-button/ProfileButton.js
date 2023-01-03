@@ -1,4 +1,4 @@
-import { AiFillBell, AiFillDislike, AiFillStar, AiOutlineRight, BsClockHistory, FaTrash, MdLock, MdNotInterested } from "../../icons";
+import { AiFillBell, AiFillDislike, AiFillStar, AiOutlineRight, BsClockHistory, FaTrash, MdLock, MdNotInterested } from "../../utils/icons";
 import "../profile-button/style.scss"
 
 export default function ProfileButton({icon, title, subtitle, lasticon, name, funct}) {

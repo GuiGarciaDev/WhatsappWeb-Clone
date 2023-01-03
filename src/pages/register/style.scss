@@ -81,8 +81,8 @@
                 input {
                     border: 0;
                     all: unset;
-                    caret-color: white;
-                    color: white;
+                    caret-color: var(--text-primary);
+                    color: var(--text-primary);
                     width: 100%;
                     text-overflow: ellipsis;
                     white-space: nowrap;

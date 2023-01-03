@@ -2,7 +2,7 @@ import './style.scss'
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useEffect } from "react";
 import { useData } from '../../../contexts/MessageContext';
-import { toastEmiterError } from '../../../toastifyemiter';
+import { toastEmiterError } from '../../../utils/toastifyemiter';
 
 const itemVariants = {
     closed: { opacity: 0, x: 40, },

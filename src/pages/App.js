@@ -7,7 +7,7 @@ import SearchBar from '../components/searchbar/SearchBar';
 import LeftSideMenu from '../components/left-sidemenu/LeftSideMenu';
 import DividerLetter from '../components/divider-letter/DividerLetter';
 import ConfigCard from '../components/config-card/ConfigCard';
-import NewContactModal from '../components/new-contact-modal/NewContactModal';
+import NewContactModal from '../components/modals/new-contact-modal/NewContactModal';
 import SendContactModal from '../components/modals/send-contact-modal/SendContactModal';
 import LeftDropDown from '../components/dropdown/left-dropdown/LeftDropDown';
 
@@ -18,15 +18,15 @@ import { useData } from '../contexts/MessageContext';
 import { firedb as db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
-import { getNormalDate } from '../date';
+import { getNormalDate } from '../utils/date';
 import { AnimatePresence, motion } from 'framer-motion';
-import { toastEmiter, toastEmiterError } from '../toastifyemiter';
+import { toastEmiter, toastEmiterError, toastEmiterSuccess } from '../utils/toastifyemiter';
 import {
   AiOutlineUserAdd, AiFillBell, AiOutlineCheck,
   BiShieldQuarter, BsFilter, BsThreeDotsVertical, BsChatLeftTextFill,
   HiDocumentText, IoMdHelpCircle, MdGroup, MdLock, MdBrightnessMedium, 
-  MdModeEdit, RiImageEditFill, SiStatuspage, VscSymbolKey
-} from '../icons'
+  MdModeEdit, RiImageEditFill, SiStatuspage, VscSymbolKey, BsCameraFill
+} from '../utils/icons'
 import Contact from '../components/contact-card/Contact';
 import ImageSlider from '../components/image-slider/ImageSlider';
 import { getContactWithEmail } from '../API';
@@ -69,8 +69,10 @@ export default function App() {
           updateDoc(userRef, {
             photoUrl: url
           })
-        })
-      }
+        })  
+      },
+      () => {toastEmiterError('Um erro ocorreu')},
+      () => {toastEmiterSuccess('Imagem atualizada com sucesso!')}
     )
   }
 
@@ -256,7 +258,9 @@ export default function App() {
                 exit={{scale: 0}}
                 transition={{duration: 0.05}}
               > 
-                <img id="preview" src={user_image} alt=""/>
+                <div className='preview_img-holder'>
+                  <img id="preview" src={user_image} alt=""/>
+                </div>
                 <input
                   type="file"
                   onChange={(e) => previewImage(e.target.files[0])}
@@ -264,7 +268,7 @@ export default function App() {
                   id="file"
                   autoComplete='off'
                 />
-                <label htmlFor="file"></label>
+                <label htmlFor="file"><BsCameraFill/></label>
             </motion.div>
             )}
           </AnimatePresence>

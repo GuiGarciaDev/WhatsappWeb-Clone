@@ -6,7 +6,7 @@ import { firedb as db} from "../firebase";
 import { generateId, updateReadStatus } from "../API";
 import { useData } from "../contexts/MessageContext";
 import { useState } from "react";
-import { AiFillCamera, HiDocument, HiUser } from '../icons'
+import { AiFillCamera, HiDocument, HiUser } from '../utils/icons'
 
 export default function Card(props) {
     const { user } = useData()
@@ -24,7 +24,9 @@ export default function Card(props) {
         const messagesNotReaded = query(messagesRef, where('read', '==', false), where('autor', '!=', user.email))
 
         onSnapshot(lastMessage, (snapshot) => {
-            setLastMessageData(snapshot.docs[0].data())
+            if (snapshot.docs[0]) {
+                setLastMessageData(snapshot.docs[0].data())
+            }
         })
 
         onSnapshot(messagesNotReaded, (snapshot) => {

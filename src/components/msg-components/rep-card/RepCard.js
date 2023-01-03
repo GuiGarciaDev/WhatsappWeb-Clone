@@ -5,7 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 
 import DropMenu from '../../dropdown/dropmenu/DropMenu';
 
-import { AiFillCamera, BsCheckAll, IoIosArrowDown, HiDocument, HiUser } from '../../../icons'
+import { AiFillCamera, BsCheckAll, IoIosArrowDown, HiDocument, HiUser } from '../../../utils/icons'
 import { getContactWithId, getRepliedMsg } from '../../../API';
 
 export default function RepCard({ el, id, chatId }) { 
