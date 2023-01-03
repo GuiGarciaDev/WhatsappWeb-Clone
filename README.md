@@ -58,5 +58,5 @@ My intention with this project is test and improve my react skills, so i'm tried
 
 ## Hosting
 
-You can check all of that in the link down below :)
+You can check all of that in the link down below :) <br>
 https://whatsapp-web-clone-61744.web.app/
